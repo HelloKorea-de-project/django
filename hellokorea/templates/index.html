@@ -1,0 +1,7 @@
+{% extends 'base.html' %} {% block content %}
+<h2>Select a Page</h2>
+<ul>
+  <li><a href="{% url 'airline_index' %}">Flights Information</a></li>
+  <li><a href="{% url 'tour_index' %}">Attractions Information</a></li>
+</ul>
+{% endblock %}
