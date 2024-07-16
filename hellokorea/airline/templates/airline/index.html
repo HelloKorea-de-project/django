@@ -1,4 +1,34 @@
 {% extends 'base.html' %} {% block content %}
-<h2>Flights Information</h2>
-<p>Details about flights will be displayed here.</p>
-{% endblock %}
+<h2>Search Flights</h2>
+<form method="get">
+  {{ form.as_p }}
+  <button type="submit">Search</button>
+</form>
+
+{% if flights %}
+<h2>Available Flights</h2>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Flight Number</th>
+      <th>Departure City</th>
+      <th>Arrival City</th>
+      <th>Departure Date</th>
+      <th>Arrival Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for flight in flights %}
+    <tr>
+      <td>{{ flight.flight_number }}</td>
+      <td>{{ flight.departure_city }}</td>
+      <td>{{ flight.arrival_city }}</td>
+      <td>{{ flight.departure_date }}</td>
+      <td>{{ flight.arrival_date }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No flights available for the selected dates.</p>
+{% endif %} {% endblock %}
