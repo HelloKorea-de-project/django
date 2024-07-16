@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Travel Info</title>
+    {% load static %}
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'tour/styles.css' %}"
+    />
   </head>
   <body>
     <header>
@@ -15,5 +21,6 @@
       <a href="{% url 'tour_index' %}">Attractions</a>
     </nav>
     <main>{% block content %} {% endblock %}</main>
+    <script src="{% static 'tour/scripts.js' %}"></script>
   </body>
 </html>
