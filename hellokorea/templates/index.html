@@ -1,7 +1,23 @@
-{% extends 'base.html' %} {% block content %}
-<h2>Select a Page</h2>
+{% extends 'base.html' %} {% load static %} {% block content %}
+<img
+  src="{% static 'main/images/main_background.png' %}"
+  alt="Background Image"
+  style="width: 100%; height: 80vh; object-fit: cover"
+/>
 <ul>
-  <li><a href="{% url 'airline_index' %}">Flights Information</a></li>
-  <li><a href="{% url 'tour_index' %}">Attractions Information</a></li>
+  <li>
+    <a href="{% url 'airline_index' %}" class="button-image flights"
+      >Flights Information</a
+    >
+    <span class="button-text">Airline</span>
+  </li>
+  <div class="divider"></div>
+  <!-- Vertical bar between buttons -->
+  <li>
+    <a href="{% url 'tour_index' %}" class="button-image attractions"
+      >Attractions Information</a
+    >
+    <span class="button-text">Tour</span>
+  </li>
 </ul>
 {% endblock %}

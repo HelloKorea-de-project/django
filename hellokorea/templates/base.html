@@ -11,6 +11,62 @@
       href="{% static 'tour/styles.css' %}"
       href="{% static 'airline/styles.css' %}"
     />
+    <style>
+      header,
+      nav {
+        position: fixed;
+        width: 100%;
+        background-color: white;
+        z-index: 1000;
+        top: 60px; /* Adjust based on the height of the header */
+      }
+      header {
+        top: 0;
+        padding-bottom: 30px;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        gap: 45px; /* Space between the buttons */
+      }
+      li {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 120px; /* Adjust size as needed */
+        height: 140px; /* Adjust size as needed */
+        border: 0px solid #ccc; /* Optional: Add a border for better visibility */
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      .button-image {
+        display: block;
+        width: 53px; /* Adjust size as needed */
+        height: 53px; /* Adjust size as needed */
+        background-size: cover;
+        text-indent: -9999px; /* Hide the text */
+      }
+      .flights {
+        background-image: url("{% static 'main/images/main_flights_icon.png' %}"); /* Path to flights image */
+      }
+      .attractions {
+        background-image: url("{% static 'main/images/main_tour_icon.png' %}"); /* Path to attractions image */
+      }
+      .button-text {
+        display: block;
+        text-indent: 0;
+        font-size: 20px;
+      }
+      .divider {
+        width: 1px;
+        height: 140px; /* Adjust height as needed */
+        background-color: #ccc; /* Color of the vertical bar */
+      }
+    </style>
   </head>
   <body>
     <header>
