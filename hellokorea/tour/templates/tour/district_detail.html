@@ -1,0 +1,395 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Kakao 지도 시작하기</title>
+  </head>
+  <body> -->
+{% extends 'base.html' %} {% block content %}
+<h1>{{ district_name }}</h1>
+<div class="district-container">
+  <div class="content-container">
+    <div class="map-container">
+      <div id="map" style="width: 100%; height: 400px"></div>
+      <span>주소</span>
+    </div>
+      <div class="list-container">
+        <div class="theme-container">
+          <div class="head-section">
+            <h2>관광</h2>
+            <select id="options" name="options">
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+              <option value="option4">Option 4</option>
+            </select>
+          </div>
+          <div class="scroll-container">
+            <div class="card-container">
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-container">
+          <div class="head-section">
+            <h2>관광</h2>
+            <div class="filter-container">
+              <input type="date" id="startdate" name="startdate">
+              <input type="date" id="enddate" name="enddate">
+              <select id="options" name="options">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+                <option value="option4">Option 4</option>
+              </select>
+            </div>
+          </div>
+          <div class="scroll-container">
+            <div class="card-container">
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="theme-container">
+          <div class="head-section">
+            <h2>관광</h2>
+            <select id="options" name="options">
+              <option value="option1">Option 1</option>
+              <option value="option2">Option 2</option>
+              <option value="option3">Option 3</option>
+              <option value="option4">Option 4</option>
+            </select>
+          </div>
+          <div class="scroll-container">
+            <div class="card-container">
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+              <div class="card">
+                <img src="https://via.placeholder.com/200x150" alt="이미지" />
+                <div class="card-content">
+                  <div class="card-title">제목</div>
+                  <div class="card-details">장르, 시간, 가격</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      padding-top: 60px;
+    }
+
+    .district-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      /* height: 100vh; */
+      margin-bottom: 50px;
+      background-color: red;
+    }
+
+    .content-container {
+      position: relative;
+      width: 85%;
+      height: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: green;
+    }
+
+    .list-container {
+      /* width: 650px; */
+      display: flex;
+      flex: 3;
+      /* height: 100%; */
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background-color: aqua;
+      gap: 30px;
+    }
+
+    .scroll-container {
+      width: 100%;
+      max-width: 1000px; /* 특정 범위 설정 */
+      overflow-x: auto;
+    }
+    .card-container {
+      display: flex;
+      width: max-content;
+    }
+    .card {
+      background-color: #fff;
+      width: 200px;
+      margin: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+    }
+    .card-content {
+      padding: 16px;
+    }
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .card-details {
+      font-size: 14px;
+      color: #666;
+    }
+    .theme-container {
+      width: 90%;
+      height: 330px;
+      background-color: bisque;
+    }
+
+    .head-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    select {
+      height: fit-content;
+    }
+
+    .map-container {
+      flex: 2;
+
+    }
+  </style>
+
+  <script
+    type="text/javascript"
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=941f361a0a2dea999051a0af3aaf3a85"
+  ></script>
+  <script>
+    var container = document.getElementById("map");
+    var options = {
+      center: new kakao.maps.LatLng(33.450701, 126.570667),
+      level: 3,
+    };
+
+    var map = new kakao.maps.Map(container, options);
+  </script>
+  {% endblock %}
+  <!-- </body>
+</html> -->
+</div>
