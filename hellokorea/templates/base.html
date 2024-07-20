@@ -12,17 +12,25 @@
       href="{% static 'airline/styles.css' %}"
     />
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
       header,
       nav {
         position: fixed;
         width: 100%;
+        padding-inline: 15px;
         background-color: white;
         z-index: 1000;
-        top: 60px; /* Adjust based on the height of the header */
+        top: 65px; /* Adjust based on the height of the header */
       }
       header {
         top: 0;
         padding-bottom: 30px;
+        padding-inline: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
       ul {
         list-style: none;
