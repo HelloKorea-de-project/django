@@ -1,11 +1,45 @@
 from django.db import models
+from django.utils import timezone
+import pytz
 
-class Flight(models.Model):
-    flight_number = models.CharField(max_length=10)
-    departure_city = models.CharField(max_length=100)
-    arrival_city = models.CharField(max_length=100)
-    departure_date = models.DateField()
-    arrival_date = models.DateField()
+class AirportInformation(models.Model):
+    airportCode = models.CharField(max_length=10, unique=True, null=False)
+    countryName = models.CharField(max_length=50, null=False)
+    currency = models.CharField(max_length=10, null=False)
 
-    def __str__(self):
-        return f"{self.flight_number} from {self.departure_city} to {self.arrival_city}"
+class ExchangeRate(models.Model):
+    createdAtKST = models.DateTimeField(auto_now_add=True, null=False)
+    currency = models.CharField(max_length=10, unique=True, null=False)
+    standardRate = models.FloatField(null=True)
+    ttb = models.FloatField(null=True)
+    tts = models.FloatField(null=True)
+
+class CheapestFlight(models.Model):
+    flightID = models.CharField(max_length=50, primary_key=True)
+    depAirport = models.CharField(max_length=10, null=False)
+    depCountryName = models.CharField(max_length=50, null=False)
+    currency = models.CharField(max_length=10, null=False)
+    arrAirport = models.CharField(max_length=10, null=False)
+    carrier = models.CharField(max_length=50, null=True)
+    depTimeUTC = models.DateTimeField(null=True)
+    arrTimeUTC = models.DateTimeField(null=True)
+    price = models.FloatField(null=True)
+    url = models.CharField(max_length=200, null=True)
+    createdDateKST = models.DateField(null=True)
+    createdAtKST = models.DateTimeField(auto_now_add=True, null=False)
+    updatedAtKST = models.DateTimeField(auto_now=True, null=False)
+
+class ArrCountToICN(models.Model):
+    createdAtKST = models.DateTimeField(auto_now_add=True, null=False)
+    updatedAtKST = models.DateTimeField(auto_now=True, null=False)
+    depAirport = models.CharField(max_length=10, unique=True, null=False)
+    count = models.IntegerField(null=False, default=0)
+
+class Weather(models.Model):
+    tmKST = models.DateField(primary_key=True)
+    avgTa = models.FloatField(null=True)
+    minTa = models.FloatField(null=True)
+    maxTa = models.FloatField(null=True)
+    sumRn = models.FloatField(null=True)
+    createdAtKST = models.DateTimeField(auto_now_add=True, null=False)
+    updatedAtKST = models.DateTimeField(auto_now=True, null=False)

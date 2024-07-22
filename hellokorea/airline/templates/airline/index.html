@@ -1,218 +1,85 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+{% block content %}
 <h2>Search Flights</h2>
 <div class="content-container" style="display: flex; flex-direction: row">
   <div style="flex: 1">
-    <form method="get" style="display: flex; flex-direction: column">
-      <label for="options">Choose an option:</label>
+    <form method="get" style="display: flex; flex-direction: column" action="{% url 'search_flights' %}">
+      <label for="options">출발공항</label>
       <select id="options" name="options">
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
-        <option value="option4">Option 4</option>
+        {% for airport in airports %}
+        <option value="{{ airport.airportCode }}">{{ airport.airportCode }}</option>
+        {% endfor %}
       </select>
-      <label for="options">Choose an option:</label>
-      <select id="options" name="options">
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
-        <option value="option4">Option 4</option>
-      </select>
-      <input type="date" id="startdate" name="startdate" />
-      <input type="date" id="enddate" name="enddate" />
+      <input type="date" id="depDate" name="depDate" required />
+      <input type="date" id="arrDate" name="arrDate" required />
       <button type="submit">Search</button>
     </form>
   </div>
+
   <div class="list-container">
     <div class="scroll-container">
       <div class="card-container">
+        {% for flight in flights %}
         <div class="card">
           <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
+            <a href="{{ flight.url }}">표 구입하러 가기 >></a>
           </div>
           <div class="card-content">
-            <div class="card-details">항공사</div>
+            <div class="card-details">{{ flight.carrier }}</div>
             <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
+              <span>{{ flight.depAirport }}</span><span>{{ flight.depTimeUTC }}</span>
             </div>
             <div class="card-details"><span>비행시간</span><span>-></span></div>
             <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
+              <span>{{ flight.arrAirport }}</span><span>{{ flight.arrTimeUTC }}</span>
             </div>
             <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
+              <span>{{ flight.price }}</span><span>{{ flight.updatedAtKST }}</span>
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
-          </div>
-          <div class="card-content">
-            <div class="card-details">항공사</div>
-            <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
-            </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
-            <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
-            </div>
-            <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
-          </div>
-          <div class="card-content">
-            <div class="card-details">항공사</div>
-            <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
-            </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
-            <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
-            </div>
-            <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
-          </div>
-          <div class="card-content">
-            <div class="card-details">항공사</div>
-            <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
-            </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
-            <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
-            </div>
-            <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
-          </div>
-          <div class="card-content">
-            <div class="card-details">항공사</div>
-            <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
-            </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
-            <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
-            </div>
-            <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="https://via.placeholder.com/200x150"
-              >표 구입하러 가기 >></a
-            >
-          </div>
-          <div class="card-content">
-            <div class="card-details">항공사</div>
-            <div class="card-details">
-              <span>출발공항</span><span>출발시간</span>
-            </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
-            <div class="card-details">
-              <span>도착공항</span><span>도착시간</span>
-            </div>
-            <div class="card-details">
-              <span>최저가</span><span>업데이트 시간</span>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
+
   <div style="flex: 2">
-    <div class="weather-list">
-      <div class="weather-item today">
-        <div class="date">
-          <span class="day">오늘</span>
-          <span class="date-num">7.17.</span>
-        </div>
-        <div class="weather">
-          <div class="time">강수량</div>
-          <div class="probability">90%</div>
-          <div class="icon">🌧️</div>
-        </div>
-        <div class="temp">
-          <span class="low">24°</span>
-          <span class="avg">28°</span>
-          <span class="high">30°</span>
-        </div>
-      </div>
-
-      <!-- Other weather items -->
-      <div class="weather-item">
-        <div class="date">
-          <span class="day">금</span>
-          <span class="date-num">7.19.</span>
-        </div>
-        <div class="weather">
-          <div class="time">강수량</div>
-          <div class="probability">60%</div>
-          <div class="icon">🌙</div>
-        </div>
-        <div class="temp">
-          <span class="low">24°</span>
-          <span class="avg">28°</span>
-          <span class="high">30°</span>
-        </div>
-      </div>
-
-      <div class="weather-item">
-        <div class="date">
-          <span class="day">금</span>
-          <span class="date-num">7.19.</span>
-        </div>
-        <div class="weather">
-          <div class="time">강수량</div>
-          <div class="probability">60%</div>
-          <div class="icon">🌙</div>
-        </div>
-        <div class="temp">
-          <span class="low">24°</span>
-          <span class="avg">28°</span>
-          <span class="high">30°</span>
-        </div>
-      </div>
-    </div>
+    {% if exchange_rate %}
     <div class="er-box">
       <div class="date">
-        <span class="day">통화단위</span>
-        <span class="date-num">기준환율</span>
+        <span class="day">통화단위: {{ exchange_rate.currency }}</span>
+        <span class="date-num">기준환율: {{ exchange_rate.standardRate }}</span>
       </div>
       <div class="weather">
-        <div class="time">ttb</div>
+        <div class="time">TTB: {{ exchange_rate.ttb }}</div>
         <div class="divider"></div>
-        <div class="time">tts</div>
+        <div class="time">TTS: {{ exchange_rate.tts }}</div>
       </div>
     </div>
+    {% endif %}
+
+    <div class="weather-list">
+      {% for weather in weather_data %}
+      <div class="weather-item">
+        <div class="date">
+          <span class="day">{{ weather.tmKST|date:"D" }}</span>
+          <span class="date-num">{{ weather.tmKST }}</span>
+        </div>
+        <div class="weather">
+          <div class="time">강수량: {{ weather.sumRn }}mm</div>
+          <div class="probability">평균기온: {{ weather.avgTa }}°</div>
+        </div>
+        <div class="temp">
+          <span class="low">최저: {{ weather.minTa }}°</span>
+          <span class="avg">평균: {{ weather.avgTa }}°</span>
+          <span class="high">최고: {{ weather.maxTa }}°</span>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 
     <style>
       body,
