@@ -1,18 +1,29 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block content %} {% load static %}
 <h2>Search Flights</h2>
 <div class="content-container" style="display: flex; flex-direction: row">
   <div style="flex: 1">
     <form method="get" style="display: flex; flex-direction: column" action="{% url 'search_flights' %}">
-      <label for="options">출발공항</label>
-      <select id="options" name="options">
+      <div style="display: flex; margin-top: 5px; flex-direction: column;">
+      <label for="depAirports">Departure Airport</label>
+      <select id="depAirports" name="depAirports" required>
+        <option value=""></option>
         {% for airport in airports %}
-        <option value="{{ airport.airportCode }}">{{ airport.airportCode }}</option>
+        <option value="{{ airport.airportCode }}" {% if request.GET.depAirports == airport.airportCode %}selected{% endif %}>{{ airport.airportCode }}</option>
         {% endfor %}
       </select>
-      <input type="date" id="depDate" name="depDate" required />
-      <input type="date" id="arrDate" name="arrDate" required />
-      <button type="submit">Search</button>
+    </div>
+    <div style="display: flex; margin-top: 5px; flex-direction: column;">
+      <label for="depDate">
+        Departure Date</label>
+      <input type="date" id="depDate" name="depDate"  value="{{ request.GET.depDate }}"/>
+    </div>
+    <div style="display: flex; margin-top: 5px; flex-direction: column;">
+      <label for="arrDate">Arrival Date</label>
+      <input type="date" id="arrDate" name="arrDate"  value="{{ request.GET.arrDate }}"/>
+    </div>
+      <button type="submit" style="margin-top: 10px;">Search</button>
+      <button type="button" onclick="resetFilters()">Reset</button>
     </form>
   </div>
 
@@ -22,19 +33,19 @@
         {% for flight in flights %}
         <div class="card">
           <div class="card-subcontent">
-            <a href="{{ flight.url }}">표 구입하러 가기 >></a>
+            <a href="{{ flight.url }}">Buy airline tickets >></a>
           </div>
           <div class="card-content">
             <div class="card-details">{{ flight.carrier }}</div>
             <div class="card-details">
               <span>{{ flight.depAirport }}</span><span>{{ flight.depTimeUTC }}</span>
             </div>
-            <div class="card-details"><span>비행시간</span><span>-></span></div>
+            <div class="card-details"><span>-></span></div>
             <div class="card-details">
               <span>{{ flight.arrAirport }}</span><span>{{ flight.arrTimeUTC }}</span>
             </div>
             <div class="card-details">
-              <span>{{ flight.price }}</span><span>{{ flight.updatedAtKST }}</span>
+              <span>{{ flight.price|floatformat:0 }}</span><span>updated at : {{ flight.updatedAtKST }}</span>
             </div>
           </div>
         </div>
@@ -47,13 +58,15 @@
     {% if exchange_rate %}
     <div class="er-box">
       <div class="date">
-        <span class="day">통화단위: {{ exchange_rate.currency }}</span>
-        <span class="date-num">기준환율: {{ exchange_rate.standardRate }}</span>
+        <span class="day">Currency Unit</span>
+        <span class="day" style="margin-bottom: 10px;">{{ exchange_rate.currency }}</span>
+        <span class="date-num">Base Exchange Rate</span>
+        <span class="date-num">{{ exchange_rate.standardRate|floatformat:0 }}</span>
       </div>
       <div class="weather">
-        <div class="time">TTB: {{ exchange_rate.ttb }}</div>
+        <div class="time">TTB: {{ exchange_rate.ttb|floatformat:0 }}</div>
         <div class="divider"></div>
-        <div class="time">TTS: {{ exchange_rate.tts }}</div>
+        <div class="time">TTS: {{ exchange_rate.tts|floatformat:0 }}</div>
       </div>
     </div>
     {% endif %}
@@ -66,13 +79,16 @@
           <span class="date-num">{{ weather.tmKST }}</span>
         </div>
         <div class="weather">
-          <div class="time">강수량: {{ weather.sumRn }}mm</div>
-          <div class="probability">평균기온: {{ weather.avgTa }}°</div>
+          <div class="precipitation"><img
+            src="{% static 'airline/images/airline_precipitation_icon.png' %}"
+            alt="Background Image"
+            style="width: 20px; height: 20px; object-fit: cover"
+          /> {{ weather.sumRn|floatformat:0 }}mm</div>
         </div>
         <div class="temp">
-          <span class="low">최저: {{ weather.minTa }}°</span>
-          <span class="avg">평균: {{ weather.avgTa }}°</span>
-          <span class="high">최고: {{ weather.maxTa }}°</span>
+          <span class="low">low: {{ weather.minTa|floatformat:0 }}°</span>
+          <span class="avg">avg: {{ weather.avgTa|floatformat:0 }}°</span>
+          <span class="high">high: {{ weather.maxTa|floatformat:0 }}°</span>
         </div>
       </div>
       {% endfor %}
@@ -80,193 +96,199 @@
   </div>
 </div>
 
+<script>
+  function resetFilters() {
+      const url = new URL(window.location.href);
+      url.search = '';  // Remove all query parameters
+      window.location.href = url.toString();  // Redirect to the URL without query parameters
+  }
+  </script>
 
-    <style>
-      body,
-      html {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        padding-top: 60px;
-      }
+<style>
+  body,
+  html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+  }
 
-      .content-container {
-        display: flex;
-        justify-content: center;
-        width: 100%;
-        margin-bottom: 50px;
-      }
+  .content-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 50px;
+  }
 
-      .list-container {
-        display: flex;
-        height: 100vh;
-        flex: 6;
-        justify-content: center;
-      }
-      .scroll-container {
-        max-height: 100%; /* 스크롤 가능한 최대 높이 설정 */
-        overflow-y: auto; /* 세로 스크롤 설정 */
-        width: 100%;
-        padding: 10px;
-      }
-      .card-container {
-        display: flex;
-        flex-direction: column; /* 카드들을 세로로 나열 */
-        gap: 10px; /* 카드들 사이의 간격 */
-        padding-inline: 10px;
-      }
+  .list-container {
+    display: flex;
+    height: 100vh;
+    flex: 6;
+    justify-content: center;
+  }
+  .scroll-container {
+    max-height: 100%; /* 스크롤 가능한 최대 높이 설정 */
+    overflow-y: auto; /* 세로 스크롤 설정 */
+    width: 100%;
+    padding: 10px;
+  }
+  .card-container {
+    display: flex;
+    flex-direction: column; /* 카드들을 세로로 나열 */
+    gap: 10px; /* 카드들 사이의 간격 */
+    padding-inline: 10px;
+  }
 
-      .card {
-        background-color: #fff;
-        width: 100%;
-        height: 200px;
-        margin: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-        flex: 0 0 auto;
-      }
-      .card-subcontent {
-        display: flex;
-        width: 100%;
-        height: auto;
-        justify-content: right;
-      }
-      .card-content {
-        display: flex;
-        height: 100%;
-        flex-direction: row;
-      }
-      .card-title {
-        font-size: 18px;
-        margin-bottom: 8px;
-      }
-      .card-details {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        font-size: 14px;
-        color: #666;
-      }
+  .card {
+    background-color: #fff;
+    width: 100%;
+    height: 200px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 0 0 auto;
+  }
+  .card-subcontent {
+    display: flex;
+    width: 100%;
+    height: auto;
+    justify-content: right;
+  }
+  .card-content {
+    display: flex;
+    height: 100%;
+    flex-direction: row;
+  }
+  .card-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+  .card-details {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 14px;
+    color: #666;
+  }
 
-      .card a {
-        text-decoration: none; /* 하이퍼링크 밑줄 제거 */
-        width: 100%;
-        background-color: #007bff; /* 버튼 배경색 */
-        color: #fff; /* 버튼 텍스트 색상 */
-        display: flex;
-        justify-content: right;
-      }
-      .card a:hover {
-        background-color: #0056b3; /* 호버 시 버튼 배경색 */
-      }
+  .card a {
+    text-decoration: none; /* 하이퍼링크 밑줄 제거 */
+    width: 100%;
+    background-color: #007bff; /* 버튼 배경색 */
+    color: #fff; /* 버튼 텍스트 색상 */
+    display: flex;
+    justify-content: right;
+  }
+  .card a:hover {
+    background-color: #0056b3; /* 호버 시 버튼 배경색 */
+  }
 
-      .weather-list {
-        display: flex;
-        flex-direction: column;
-        width: 350px;
-        margin: auto;
-        margin-bottom: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-      }
+  .weather-list {
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+    margin: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+  }
 
-      .weather-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-      }
+  .weather-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
 
-      .weather-item:last-child {
-        border-bottom: none;
-      }
+  .weather-item:last-child {
+    border-bottom: none;
+  }
 
-      .weather-item.today {
-        background-color: #f0f0f0;
-      }
+  .weather-item.today {
+    background-color: #f0f0f0;
+  }
 
-      .date {
-        display: flex;
-        flex: 1;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-      }
+  .date {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
 
-      .date .day {
-        display: flex;
-        font-weight: bold;
-        font-size: 1.2em;
-      }
+  .date .day {
+    display: flex;
+    font-weight: bold;
+    font-size: 1.2em;
+  }
 
-      .weather {
-        display: flex;
-        flex: 1;
-        text-align: center;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-      }
+  .weather {
+    display: flex;
+    flex: 1;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
 
-      .weather .time {
-        font-size: 0.8em;
-      }
+  .weather .precipitation {
+    font-size: 0.8em;
+  }
 
-      .weather .probability {
-        font-size: 0.8em;
-        color: #555;
-      }
+  .weather .probability {
+    font-size: 0.8em;
+    color: #555;
+  }
 
-      .weather .icon {
-        font-size: 1.5em;
-      }
+  .weather .icon {
+    font-size: 1.5em;
+  }
 
-      .temp {
-        flex: 1;
-        text-align: right;
-      }
+  .temp {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-align: right;
+  }
 
-      .temp .low {
-        color: blue;
-      }
+  .temp .low {
+    color: blue;
+  }
 
-      .temp .avg {
-        color: green;
-        margin-left: 5px;
-      }
+  .temp .avg {
+    color: green;
+    margin-left: 5px;
+  }
 
-      .temp .high {
-        color: red;
-        margin-left: 5px;
-      }
+  .temp .high {
+    color: red;
+    margin-left: 5px;
+  }
 
-      .er-box {
-        display: flex;
-        flex-direction: row;
-        width: 350px;
-        margin: auto;
-        margin-top: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-        padding-block: 20px;
-      }
+  .er-box {
+    display: flex;
+    flex-direction: row;
+    width: 350px;
+    margin: auto;
+    margin-bottom: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    padding-block: 20px;
+  }
 
-      .divider {
-        height: 1px;
-        width: 80%; /* Adjust height as needed */
-        background-color: #ccc; /* Color of the vertical bar */
-      }
-    </style>
-    {% endblock %}
-  </div>
-</div>
+  .divider {
+    height: 1px;
+    width: 80%; /* Adjust height as needed */
+    background-color: #ccc; /* Color of the vertical bar */
+  }
+</style>
+{% endblock %}

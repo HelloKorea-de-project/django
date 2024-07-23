@@ -3,8 +3,8 @@
 <div class="district-container">
   <div class="content-container">
     <div class="map-container">
-      <div id="map" style="width: 100%; height: 400px"></div>
-      <span>주소</span>
+      <div id="map" style="width: 100%; height: 100vh"></div>
+      <span id="card-address">Address</span>
     </div>
     <div class="list-container">
       <div class="theme-container">
@@ -80,7 +80,6 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    /* height: 100vh; */
     margin-bottom: 50px;
   }
 
@@ -94,10 +93,8 @@
   }
 
   .list-container {
-    /* width: 650px; */
     display: flex;
     flex: 3;
-    /* height: 100%; */
     justify-content: center;
     align-items: center;
     flex-direction: column;
@@ -107,7 +104,7 @@
 
   .scroll-container {
     width: 100%;
-    max-width: 1000px; /* 특정 범위 설정 */
+    max-width: 1000px;
     overflow-x: auto;
   }
   .card-container {
@@ -156,76 +153,119 @@
   .map-container {
     flex: 2;
   }
+
+  #map {
+    border-radius: 10px;
+  }
 </style>
 
-<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=941f361a0a2dea999051a0af3aaf3a85"></script>
+<script
+  type="text/javascript"
+  src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=qjmybmgri1&submodules=geocoder&language=en"
+></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var districtName = "{{ district_name }}";
+    var districtKorName = "{{ district_korName }}";
+    var markers = [];
 
-    // Initialize Kakao Map
+    // Initialize Naver Map
     var mapContainer = document.getElementById("map");
     var mapOptions = {
-      center: new kakao.maps.LatLng(37.5665, 126.978),
-      level: 3,
+      center: new naver.maps.LatLng(37.5665, 126.978),
+      zoom: 10,
     };
-    var map = new kakao.maps.Map(mapContainer, mapOptions);
+    var map = new naver.maps.Map(mapContainer, mapOptions);
 
-    // Fetch initial data
-    fetch(`/tour/district/${districtName}/all/`)
+    naver.maps.Event.once(map, "init", function () {
+      searchLocation(districtKorName);
+    });
+
+    // Fetch initial data for all sections
+    fetch(`/tour/district/${districtName}/tour-info/`)
       .then((response) => response.json())
       .then((data) => {
-        updateCards(data);
+        updateAttractions(data.tour_infos);
+      });
+
+    fetch(`/tour/district/${districtName}/performances/`)
+      .then((response) => response.json())
+      .then((data) => {
+        updatePerformances(data.performances);
+      });
+
+    fetch(`/tour/district/${districtName}/lodgings/`)
+      .then((response) => response.json())
+      .then((data) => {
+        updateLodgings(data.lodgings);
       });
 
     // Filter data based on user inputs
     document
       .getElementById("mainCategories")
       .addEventListener("change", function () {
-        fetchFilteredData();
+        fetchTourInfo();
       });
 
     document
       .getElementById("startdate")
       .addEventListener("change", function () {
-        fetchFilteredData();
+        fetchPerformances();
       });
 
     document.getElementById("enddate").addEventListener("change", function () {
-      fetchFilteredData();
+      fetchPerformances();
     });
 
     document.getElementById("genrenms").addEventListener("change", function () {
-      fetchFilteredData();
+      fetchPerformances();
     });
 
     document.getElementById("uptaenms").addEventListener("change", function () {
-      fetchFilteredData();
+      fetchLodgings();
     });
 
-    function fetchFilteredData() {
+    function fetchTourInfo() {
       var category = document.getElementById("mainCategories").value;
-      var startDate = document.getElementById("startdate").value;
-      var endDate = document.getElementById("enddate").value;
-      var genre = document.getElementById("genrenms").value;
-      var uptaenms = document.getElementById("uptaenms").value;
-
-      var url = `/tour/district/${districtName}/filter/?category=${category}&start_date=${startDate}&end_date=${endDate}&genre=${genre}&uptaenms=${uptaenms}`;
+      var url = `/tour/district/${districtName}/tour-info/?category=${category}`;
 
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          updateCards(data);
+          updateAttractions(data.tour_infos);
         });
     }
 
-    function updateCards(data) {
-      // Update Attractions cards
+    function fetchPerformances() {
+      var startDate = document.getElementById("startdate").value;
+      var endDate = document.getElementById("enddate").value;
+      var genre = document.getElementById("genrenms").value;
+      var url = `/tour/district/${districtName}/performances/?start_date=${startDate}&end_date=${endDate}&genre=${genre}`;
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          updatePerformances(data.performances);
+        });
+    }
+
+    function fetchLodgings() {
+      var uptaenms = document.getElementById("uptaenms").value;
+      var url = `/tour/district/${districtName}/lodgings/?uptaenms=${uptaenms}`;
+
+      fetch(url)
+        .then((response) => response.json())
+        .then((data) => {
+          updateLodgings(data.lodgings);
+        });
+    }
+
+    function updateAttractions(tourInfos) {
       var attractionsContainer = document.getElementById(
         "attractions-container"
       );
       attractionsContainer.innerHTML = "";
-      data.tour_infos.forEach((info) => {
+      tourInfos.forEach((info) => {
         var card = createCard(
           info.firstImage,
           info.title,
@@ -236,13 +276,14 @@
         );
         attractionsContainer.appendChild(card);
       });
+    }
 
-      // Update Performances cards
+    function updatePerformances(performances) {
       var performancesContainer = document.getElementById(
         "performances-container"
       );
       performancesContainer.innerHTML = "";
-      data.performances.forEach((info) => {
+      performances.forEach((info) => {
         var card = createCard(
           info.poster,
           info.prfnm,
@@ -253,11 +294,12 @@
         );
         performancesContainer.appendChild(card);
       });
+    }
 
-      // Update Lodgings cards
+    function updateLodgings(lodgings) {
       var lodgingsContainer = document.getElementById("lodgings-container");
       lodgingsContainer.innerHTML = "";
-      data.lodgings.forEach((info) => {
+      lodgings.forEach((info) => {
         var card = createCard(
           "https://via.placeholder.com/200x150",
           info.bplcnm,
@@ -274,7 +316,7 @@
       var card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${imageSrc}" alt="이미지" />
+        <img src="${imageSrc}" alt="이미지" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x150';" />
         <div class="card-content">
           <div class="card-title">${title}</div>
           <div class="card-details">${details}</div>
@@ -282,18 +324,63 @@
       `;
       card.addEventListener("mouseover", function () {
         console.log(lat, lng);
-        var markerPosition = new kakao.maps.LatLng(lat, lng);
-        var marker = new kakao.maps.Marker({
+        clearMarkers();
+
+        var markerPosition = new naver.maps.LatLng(lat, lng);
+        var marker = new naver.maps.Marker({
           position: markerPosition,
+          map: map,
         });
-        marker.setMap(map);
         map.setCenter(markerPosition);
+        map.setZoom(15);
+
+        markers.push(marker);
 
         // Update the address span with the current card's address
-        var addressSpan = document.querySelector(".map-container span");
-        addressSpan.textContent = address;
+        var addressSpan = document.getElementById("card-address");
+        if (addressSpan) {
+          addressSpan.textContent = address;
+          console.log("Address span updated:", address);
+        } else {
+          console.error("Address span not found");
+        }
       });
       return card;
+    }
+
+    function searchLocation(query) {
+      naver.maps.Service.geocode({ query: query }, function (status, response) {
+        if (status !== naver.maps.Service.Status.OK) {
+          console.error("Geocode Error:", status, response);
+          return alert("Something went wrong!");
+        }
+
+        var result = response.v2.addresses[0];
+        if (!result) {
+          console.error("No addresses found:", response);
+          return alert("No addresses found!");
+        }
+
+        var location = new naver.maps.LatLng(result.y, result.x);
+
+        console.log("Location found:", location);
+
+        map.setCenter(location);
+        map.setZoom(13);
+        var marker = new naver.maps.Marker({
+          position: location,
+          map: map,
+        });
+
+        markers.push(marker);
+      });
+    }
+
+    function clearMarkers() {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(null);
+      }
+      markers = [];
     }
   });
 </script>

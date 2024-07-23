@@ -475,7 +475,7 @@
 	c1.75-11.883,0-27.833,0-43.01c0-15.213,2.144-31.803,0-43.51C207.808,816.662,200.691,810.254,199.39,804.313z"
       />
       <path
-        id="Yeongdeungpo-gu_1_"
+        id="Yeongdeungpo-gu"
         fill-rule="evenodd"
         clip-rule="evenodd"
         fill="#C8C8C8"
@@ -509,14 +509,6 @@
 	C730.596,766.053,735.563,764.919,737.012,767.305z"
       />
     </svg>
-    <!-- <div id="info-section">
-      <div id="info-box" class="info-box">
-        <h3 id="district-name">District Name</h3>
-        <p id="district-info">
-          Information about the district will appear here.
-        </p>
-      </div>
-    </div> -->
     <div id="info-section">
       <div id="info-box" class="info-box">
         <h3 id="district-name">Seoul Map Highlights</h3>
@@ -542,12 +534,20 @@
     padding-top: 60px;
   }
 
+  .circle {
+    display: inline-block;
+    width: 10px; /* 원의 크기를 조정하세요 */
+    height: 10px; /* 원의 크기를 조정하세요 */
+    border-radius: 50%;
+    margin-right: 5px; /* 원과 텍스트 사이의 간격을 조정하세요 */
+  }
+
   .tour-container {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100vh;
+    height: 70vh;
   }
 
   .map-container {
@@ -572,16 +572,14 @@
   }
 
   .info-box {
-    /* display: none; */
     position: relative;
     background-color: white;
-    /* border: 1px solid black; */
     padding: 10px;
-    width: 300px;
+    width: 400px;
     z-index: 10;
   }
   .map-container path {
-    fill: #ccc;
+    fill: #f6eddb;
     stroke: #333;
     stroke-width: 1;
   }
@@ -599,6 +597,10 @@
     const maxPerformanceInfo = document.getElementById("max-performance-info");
     const maxLodgingInfo = document.getElementById("max-lodging-info");
 
+    addColoredCircle("max-tourism-info", "#ffcc00"); // 빨간색 원
+    addColoredCircle("max-performance-info", "#66ccff"); // 초록색 원
+    addColoredCircle("max-lodging-info", "#ff6699"); // 파란색 원
+
     fetch("{% url 'get_district_info' %}")
       .then((response) => response.json())
       .then((data) => {
@@ -610,8 +612,8 @@
         delete data["max_lodging"];
 
         // Display initial highlights in the info box
-        maxTourismInfo.textContent = `District with most tourism spots: ${maxTourism}`;
-        maxPerformanceInfo.textContent = `District with most performance venues: ${maxPerformance}`;
+        maxTourismInfo.textContent = `District with most tourisms: ${maxTourism}`;
+        maxPerformanceInfo.textContent = `District with most performances: ${maxPerformance}`;
         maxLodgingInfo.textContent = `District with most lodgings: ${maxLodging}`;
 
         document.querySelectorAll("#seoul-map path").forEach(function (path) {
@@ -622,7 +624,7 @@
             const lodgingCount = data[districtId].lodging_count || 0;
 
             // Determine color based on max data
-            let color = "#ccc";
+            let color = "#f6eddb";
             if (districtId === maxTourism) color = "#ffcc00";
             if (districtId === maxPerformance) color = "#66ccff";
             if (districtId === maxLodging) color = "#ff6699";
@@ -631,7 +633,7 @@
 
             path.addEventListener("mouseover", function () {
               path.setAttribute("data-original-fill", path.style.fill); // Save original fill color
-              path.style.fill = "#f00"; // Change fill color on hover
+              path.style.fill = "#f6eddb80"; // Change fill color on hover
               districtName.textContent = districtId;
               districtInfo.textContent = `Tourism: ${tourism}, Performance: ${performance}, Lodging Count: ${lodgingCount}`;
               infoBox.style.display = "block";
@@ -644,6 +646,10 @@
 										  <span id="max-performance-info">${maxPerformanceInfo.textContent}</span><br>
 										  <span id="max-lodging-info">${maxLodgingInfo.textContent}</span>`;
               infoBox.style.display = "block";
+
+              addColoredCircle("max-tourism-info", "#ffcc00"); // 빨간색 원
+              addColoredCircle("max-performance-info", "#66ccff"); // 초록색 원
+              addColoredCircle("max-lodging-info", "#ff6699"); // 파란색 원
             });
 
             path.addEventListener("click", function () {
@@ -653,148 +659,15 @@
         });
       });
   });
+
+  function addColoredCircle(spanId, color) {
+    const span = document.getElementById(spanId);
+    if (span) {
+      const circle = document.createElement("span");
+      circle.className = "circle";
+      circle.style.backgroundColor = color;
+      span.parentNode.insertBefore(circle, span);
+    }
+  }
 </script>
-
-<!-- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const infoBox = document.getElementById("info-box");
-    const districtName = document.getElementById("district-name");
-    const districtInfo = document.getElementById("district-info");
-
-    fetch("{% url 'get_district_info' %}")
-      .then((response) => response.json())
-      .then((data) => {
-        const maxTourism = data["max_tourism"];
-        const maxPerformance = data["max_performance"];
-        const maxLodging = data["max_lodging"];
-        delete data["max_tourism"];
-        delete data["max_performance"];
-        delete data["max_lodging"];
-
-        document.querySelectorAll("#seoul-map path").forEach(function (path) {
-          const districtId = path.id;
-          if (data[districtId]) {
-            const tourism = data[districtId].tourism || 0;
-            const performance = data[districtId].performance || 0;
-            const lodgingCount = data[districtId].lodging_count || 0;
-
-            // Determine color based on max data
-            let color = "#ccc";
-            if (districtId === maxTourism) color = "#ffcc00";
-            if (districtId === maxPerformance) color = "#66ccff";
-            if (districtId === maxLodging) color = "#ff6699";
-
-            path.style.fill = color;
-
-            path.addEventListener("mouseover", function () {
-              path.setAttribute("data-original-fill", path.style.fill); // Save original fill color
-              path.style.fill = "#f00"; // Change fill color on hover
-              districtName.textContent = districtId;
-              districtInfo.textContent = `Tourism: ${tourism}, Performance: ${performance}, Lodging Count: ${lodgingCount}`;
-              infoBox.style.display = "block";
-            });
-
-            path.addEventListener("mouseout", function () {
-              path.style.fill = path.getAttribute("data-original-fill"); // Restore original fill color
-              infoBox.style.display = "none";
-            });
-
-            path.addEventListener("click", function () {
-              location.href = `/district_detail/${path.id}`;
-            });
-          }
-        });
-      });
-  });
-</script> -->
-
-<!-- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const infoBox = document.getElementById("info-box");
-    const districtName = document.getElementById("district-name");
-    const districtInfo = document.getElementById("district-info");
-
-    fetch("{% url 'get_district_info' %}")
-      .then((response) => response.json())
-      .then((data) => {
-        const maxTourism = data["max_tourism"];
-        const maxPerformance = data["max_performance"];
-        const maxLodging = data["max_lodging"];
-        delete data["max_tourism"];
-        delete data["max_performance"];
-        delete data["max_lodging"];
-
-        document.querySelectorAll("#seoul-map path").forEach(function (path) {
-          const districtId = path.id;
-          if (data[districtId]) {
-            const tourism = data[districtId].tourism || 0;
-            const performance = data[districtId].performance || 0;
-            const lodgingCount = data[districtId].lodging_count || 0;
-
-            // Determine color based on max data
-            let color = "#ccc";
-            if (districtId === maxTourism) color = "#ffcc00";
-            if (districtId === maxPerformance) color = "#66ccff";
-            if (districtId === maxLodging) color = "#ff6699";
-
-            path.style.fill = color; // Update this line
-
-            path.addEventListener("mouseover", function () {
-              districtName.textContent = districtId;
-              districtInfo.textContent = `Tourism: ${tourism}, Performance: ${performance}, Lodging Count: ${lodgingCount}`;
-              infoBox.style.display = "block";
-            });
-            path.addEventListener("mouseout", function () {
-              infoBox.style.display = "none";
-            });
-            path.addEventListener("click", function () {
-              location.href = `/district_detail/${path.id}`;
-            });
-          }
-        });
-      });
-  });
-</script> -->
-
-<!-- <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const infoBox = document.getElementById("info-box");
-    const districtName = document.getElementById("district-name");
-    const districtInfo = document.getElementById("district-info");
-
-    fetch("{% url 'get_district_info' %}")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        document.querySelectorAll("#seoul-map path").forEach(function (path) {
-          const districtId = path.id;
-          if (data[districtId]) {
-            const tourism = data[districtId].tourism || "N/A";
-            const performance = data[districtId].performance || "N/A";
-            const lodgingCount = data[districtId].lodging_count || 0;
-
-            // Determine color based on data
-            let color = "#ccc";
-            if (lodgingCount > 0) color = "#ff6699";
-            if (performance !== "N/A") color = "#66ccff";
-            if (tourism !== "N/A") color = "#ffcc00";
-
-            path.style.fill = color;
-
-            path.addEventListener("mouseover", function () {
-              districtName.textContent = districtId;
-              districtInfo.textContent = `Tourism: ${tourism}, Performance: ${performance}, Lodging Count: ${lodgingCount}`;
-              infoBox.style.display = "block";
-            });
-            path.addEventListener("mouseout", function () {
-              infoBox.style.display = "none";
-            });
-            path.addEventListener("click", function () {
-              location.href = `/district_detail/${path.id}`;
-            });
-          }
-        });
-      });
-  });
-</script> -->
 {% endblock %}

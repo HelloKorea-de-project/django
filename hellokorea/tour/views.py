@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
+from .models import *
 from django.db.models import Count
-from .models import SeoulTourInfo, Performances, Lodging, SeoulAreaCode
 
 
 def index(request):
@@ -17,18 +17,16 @@ def district_detail(request, district_name):
     # Get unique lodging types
     lodging_types = Lodging.objects.values_list('uptaenm', flat=True).distinct()
 
+    district_korName = SeoulAreaCode.objects.get(name=district_name).korName
+
     context = {
         'district_name': district_name,
+        'district_korName': district_korName,
         'main_categories': main_categories,
         'genres': genres,
         'lodging_types': lodging_types
     }
     return render(request, 'tour/district_detail.html', context)
-
-from django.shortcuts import render
-from django.http import JsonResponse
-from .models import SeoulAreaCode, SeoulTourInfo, Performances, Lodging, PerformancesFacilities
-from django.db.models import Count
 
 def get_district_info(request):
     # Fetch data for tourism, performance, and lodging
@@ -50,8 +48,11 @@ def get_district_info(request):
         tourism_count[district_name] = tourism_count.get(district_name, 0) + item['count']
     
     for item in performance_data:
-        district_name = item['gugunnm']
-        performance_count[district_name] = item['count']
+        try:
+            district_name = SeoulAreaCode.objects.get(korName=item['gugunnm']).name
+            performance_count[district_name] = item['count']
+        except SeoulAreaCode.DoesNotExist:
+            continue
     
     for item in lodging_data:
         area_code = item['addCode']
@@ -82,23 +83,18 @@ def get_district_info(request):
     
     return JsonResponse(districts_info)
 
-
-# views.py
-from django.shortcuts import render
-from django.http import JsonResponse
-from django.db.models import Prefetch
-from .models import SeoulTourInfo, Performances, Lodging, SeoulAreaCode, TourismServiceCategory
-
 def get_district_detail(request, district_name):
     if request.method == "GET":
         # Fetch the SeoulAreaCode based on the district_name
-        area_code = SeoulAreaCode.objects.get(name=district_name).code
+        seoul_area_info = SeoulAreaCode.objects.get(name=district_name)
+        area_code = seoul_area_info.code
+        area_korName = seoul_area_info.korName
 
         # Fetch data based on district_name
         tour_infos = SeoulTourInfo.objects.filter(siGunGuCode__name=district_name).select_related('contentTypeID').values(
             'firstImage', 'title', 'contentTypeID__subCategory1', 'contentTypeID__subCategory2', 'addr', 'la', 'lo'
         )
-        performances = Performances.objects.filter(mt10id__gugunnm=district_name).values(
+        performances = Performances.objects.filter(mt10id__gugunnm=area_korName).values(
             'poster', 'prfnm', 'genrenm', 'prfpdfrom', 'prfpdto', 'pcseguidance', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
         )
         lodgings = Lodging.objects.filter(addCode=area_code).values(
@@ -115,46 +111,94 @@ def get_district_detail(request, district_name):
             'performances': performances,
             'lodgings': lodgings
         })
+    
+def get_tour_info(request, district_name):
+    category = request.GET.get('category')
+    tour_infos = SeoulTourInfo.objects.filter(siGunGuCode__name=district_name).select_related('contentTypeID').values(
+        'firstImage', 'title', 'contentTypeID__subCategory1', 'contentTypeID__subCategory2', 'addr', 'la', 'lo'
+    )
+    if category:
+        tour_infos = tour_infos.filter(contentTypeID__mainCategory=category)
 
-def filter_data(request, district_name):
-    if request.method == "GET":
-        category = request.GET.get('category')
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
-        genre = request.GET.get('genre')
-        uptaenms = request.GET.get('uptaenms')
+    tour_infos = list(tour_infos)
+    return JsonResponse({'tour_infos': tour_infos})
 
-        # Fetch the SeoulAreaCode based on the district_name
-        area_code = SeoulAreaCode.objects.get(name=district_name).code
+def get_performances(request, district_name):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    genre = request.GET.get('genre')
 
-        # Fetch and filter data based on user inputs
-        tour_infos = SeoulTourInfo.objects.filter(siGunGuCode__name=district_name).select_related('contentTypeID').values(
-            'firstImage', 'title', 'contentTypeID__subCategory1', 'contentTypeID__subCategory2', 'addr', 'la', 'lo'
-        )
-        if category:
-            tour_infos = tour_infos.filter(contentTypeID__mainCategory=category)
+    area_korName = SeoulAreaCode.objects.get(name=district_name).korName
+    
+    performances = Performances.objects.filter(mt10id__gugunnm=area_korName).values(
+        'poster', 'prfnm', 'genrenm', 'prfpdfrom', 'prfpdto', 'pcseguidance', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
+    )
+    if start_date and end_date:
+        performances = performances.filter(prfpdfrom__lte=start_date, prfpdto__gte=end_date)
+    elif start_date:
+        performances = performances.filter(prfpdfrom__lte=start_date)
+    elif end_date:
+        performances = performances.filter(prfpdto__gte=end_date)
+    if genre:
+        performances = performances.filter(genrenm=genre)
+
+    performances = list(performances)
+    return JsonResponse({'performances': performances})
+
+def get_lodgings(request, district_name):
+    uptaenms = request.GET.get('uptaenms')
+
+    # Fetch the SeoulAreaCode based on the district_name
+    area_code = SeoulAreaCode.objects.get(name=district_name).code
+
+    lodgings = Lodging.objects.filter(addCode=area_code).values(
+        'mgtno', 'rdnwhladdr', 'bplcnm', 'uptaenm', 'lo', 'la'
+    )
+    if uptaenms:
+        lodgings = lodgings.filter(uptaenm=uptaenms)
+
+    lodgings = list(lodgings)
+    return JsonResponse({'lodgings': lodgings})
+
+# def filter_data(request, district_name):
+#     if request.method == "GET":
+#         category = request.GET.get('category')
+#         start_date = request.GET.get('start_date')
+#         end_date = request.GET.get('end_date')
+#         genre = request.GET.get('genre')
+#         uptaenms = request.GET.get('uptaenms')
+
+#         # Fetch the SeoulAreaCode based on the district_name
+#         area_code = SeoulAreaCode.objects.get(name=district_name).code
+
+#         # Fetch and filter data based on user inputs
+#         tour_infos = SeoulTourInfo.objects.filter(siGunGuCode__name=district_name).select_related('contentTypeID').values(
+#             'firstImage', 'title', 'contentTypeID__subCategory1', 'contentTypeID__subCategory2', 'addr', 'la', 'lo'
+#         )
+#         if category:
+#             tour_infos = tour_infos.filter(contentTypeID__mainCategory=category)
         
-        performances = Performances.objects.filter(mt10id__gugunnm=district_name).values(
-            'poster', 'prfnm', 'genrenm', 'prfpdfrom', 'prfpdto', 'pcseguidance', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
-        )
-        if start_date and end_date:
-            performances = performances.filter(prfpdfrom__gte=start_date, prfpdto__lte=end_date)
-        if genre:
-            performances = performances.filter(genrenm=genre)
+#         performances = Performances.objects.filter(mt10id__gugunnm=district_name).values(
+#             'poster', 'prfnm', 'genrenm', 'prfpdfrom', 'prfpdto', 'pcseguidance', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
+#         )
+#         if start_date and end_date:
+#             performances = performances.filter(prfpdfrom__gte=start_date, prfpdto__lte=end_date)
+#         if genre:
+#             performances = performances.filter(genrenm=genre)
 
-        lodgings = Lodging.objects.filter(addCode=area_code).values(
-            'mgtno', 'rdnwhladdr', 'bplcnm', 'uptaenm', 'lo', 'la'
-        )
-        if uptaenms:
-            lodgings = lodgings.filter(uptaenm=uptaenms)
+#         lodgings = Lodging.objects.filter(addCode=area_code).values(
+#             'mgtno', 'rdnwhladdr', 'bplcnm', 'uptaenm', 'lo', 'la'
+#         )
+#         if uptaenms:
+#             lodgings = lodgings.filter(uptaenm=uptaenms)
 
-        # Convert querysets to list of dictionaries
-        tour_infos = list(tour_infos)
-        performances = list(performances)
-        lodgings = list(lodgings)
+#         # Convert querysets to list of dictionaries
+#         tour_infos = list(tour_infos)
+#         performances = list(performances)
+#         lodgings = list(lodgings)
 
-        return JsonResponse({
-            'tour_infos': tour_infos,
-            'performances': performances,
-            'lodgings': lodgings
-        })
+#         return JsonResponse({
+#             'tour_infos': tour_infos,
+#             'performances': performances,
+#             'lodgings': lodgings
+#         })
