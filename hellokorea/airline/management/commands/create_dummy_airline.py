@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import random
 import pytz
-from airline.models import AirportInformation, ExchangeRate, CheapestFlight, ArrCountToICN, Weather
+from airline.models import AirportInformation, ExchangeRate, CheapestFlight, ArrCountToICN, Weather, ServiceAirportICN
 
 class Command(BaseCommand):
     help = 'Populate the database with dummy data'
@@ -15,54 +15,56 @@ class Command(BaseCommand):
         CheapestFlight.objects.all().delete()
         ArrCountToICN.objects.all().delete()
         Weather.objects.all().delete()
+        ServiceAirportICN.objects.all().delete()
 
         # Dummy data for AirportInformation
         airports = [
-            {"airportCode": "ICN", "countryName": "South Korea", "currency": "KRW"},
-            {"airportCode": "JFK", "countryName": "United States", "currency": "USD"},
-            {"airportCode": "LAX", "countryName": "United States", "currency": "USD"},
-            {"airportCode": "NRT", "countryName": "Japan", "currency": "JPY"}
+            {"airportCode": "ICN", "countryCode": "KR", "currencyCode": "KRW"},
+            {"airportCode": "JFK", "countryCode": "US", "currencyCode": "USD"},
+            {"airportCode": "LAX", "countryCode": "US", "currencyCode": "USD"},
+            {"airportCode": "NRT", "countryCode": "JP", "currencyCode": "JPY"}
         ]
         for airport in airports:
             airport_info = AirportInformation(**airport)
             airport_info.save()
 
+        # Dummy data for ServiceAirportICN
+        for airport in airports:
+            service_airport = ServiceAirportICN(**airport)
+            service_airport.save()
+
         # Dummy data for ExchangeRate
         currencies = ["KRW", "USD", "JPY", "EUR"]
         for currency in currencies:
             exchange_rate = ExchangeRate(
-                currency=currency,
+                currencyCode=currency,
                 standardRate=random.uniform(0.8, 1500),
                 ttb=random.uniform(0.7, 1490),
                 tts=random.uniform(0.9, 1510)
             )
             exchange_rate.save()
 
-        kst = pytz.timezone('America/Chicago')
+        kst = pytz.timezone('Asia/Seoul')
 
         # Dummy data for CheapestFlight
         for i in range(1, 6):
             cheapest_flight = CheapestFlight(
-                flightID=f"FL{i:03d}",
-                depAirport=random.choice(["ICN", "JFK", "LAX", "NRT"]),
-                depCountryName=random.choice(["South Korea", "United States", "Japan"]),
-                currency=random.choice(["KRW", "USD", "JPY"]),
-                arrAirport=random.choice(["ICN", "JFK", "LAX", "NRT"]),
-                carrier=random.choice(["Korean Air", "Delta", "ANA", "United"]),
-                # depTimeUTC=timezone.make_aware(datetime(2024, 8, i, 10, 0), pytz.utc),
-                # arrTimeUTC=timezone.make_aware(datetime(2024, 8, i, 18, 0), pytz.utc),
-                depTimeUTC=kst.localize(datetime(2024, 8, i, 10, 0)),
-                arrTimeUTC=kst.localize(datetime(2024, 8, i, 18, 0)),
+                id=f"FL{i:03d}",
+                depAirportCode=random.choice(["ICN", "JFK", "LAX", "NRT"]),
+                currencyCode=random.choice(["KRW", "USD", "JPY"]),
+                arrAirportCode=random.choice(["ICN", "JFK", "LAX", "NRT"]),
+                carrierName=random.choice(["Korean Air", "Delta", "ANA", "United"]),
+                depTime=timezone.make_aware(datetime(2024, 8, i, 10, 0), kst),
+                arrTime=timezone.make_aware(datetime(2024, 8, i, 18, 0), kst),
                 price=random.uniform(100.0, 2000.0),
-                url=f"http://example.com/flight/FL{i:03d}",
-                createdDateKST=datetime(2024, 7, 20).date()
+                url=f"http://example.com/flight/FL{i:03d}"
             )
             cheapest_flight.save()
 
         # Dummy data for ArrCountToICN
         for airport_code in ["JFK", "LAX", "NRT"]:
             arr_count = ArrCountToICN(
-                depAirport=airport_code,
+                airportCode=airport_code,
                 count=random.randint(1, 10)
             )
             arr_count.save()
@@ -71,7 +73,7 @@ class Command(BaseCommand):
         base_date = datetime(2024, 7, 20)
         for i in range(10):
             weather = Weather(
-                tmKST=(base_date + timedelta(days=i)).date(),
+                tm=(base_date + timedelta(days=i)).date(),
                 avgTa=random.uniform(20.0, 30.0),
                 minTa=random.uniform(15.0, 25.0),
                 maxTa=random.uniform(25.0, 35.0),

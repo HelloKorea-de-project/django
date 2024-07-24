@@ -70,6 +70,7 @@ class Command(BaseCommand):
         for code, name, korean_name in areas:
             SeoulAreaCode.objects.get_or_create(code=code, name=name, korName=korean_name)
             self.korean_area_names[code] = korean_name
+
     def create_seoul_tour_info(self):
         tours = [
             ('1001', '1', 1, 'Address1', 'Title1', 'Image1', 37.5665, 126.9780),
