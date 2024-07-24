@@ -50,6 +50,7 @@ nosetests.xml
 # Environments
 /local
 *.env
+.env.*
 .venv
 ENV/
 env.bak/
