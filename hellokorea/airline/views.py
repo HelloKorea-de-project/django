@@ -17,19 +17,19 @@ def index(request):
     one_week_later = today + timedelta(days=7)
 
     # Fetch flights within the next month
-    flights = CheapestFlight.objects.filter(arrTimeUTC__date__range=[today, one_month_later])
-    # Apply timezone conversion to arrTimeUTC field for each flight
+    flights = CheapestFlight.objects.filter(arrTime__date__range=[today, one_month_later])
+    # Apply timezone conversion to arrTime field for each flight
     for flight in flights:
         try:
             dep_country_name = flight.depCountryName
             flight_dep_timezone = get_timezone_by_country(dep_country_name)
-            flight.depTimeUTC = flight.depTimeUTC.astimezone(flight_dep_timezone)
-            flight.arrTimeUTC = flight.arrTimeUTC.astimezone('Asia/Seoul')
+            flight.depTime = flight.depTime.astimezone(flight_dep_timezone)
+            flight.arrTime = flight.arrTime.astimezone('Asia/Seoul')
         except Exception as e:
-            print(f"Error converting timezone for flight {flight.flightID}: {e}")
+            print(f"Error converting timezone for flight {flight.id}: {e}")
 
     # Fetch weather data for the next week
-    weather_data = Weather.objects.filter(tmKST__range=[today, one_week_later])
+    weather_data = Weather.objects.filter(tm__range=[today, one_week_later])
 
     context = {
         'airports': airports,
@@ -40,7 +40,7 @@ def index(request):
     return render(request, 'airline/index.html', context)
 
 def search_flights(request):
-    dep_airport = request.GET.get('depAirports')
+    dep_airport = request.GET.get('depAirportCodes')
     dep_date = request.GET.get('depDate')
     arr_date = request.GET.get('arrDate')
 
@@ -50,37 +50,37 @@ def search_flights(request):
     if not dep_airport:
         return render(request, 'airline/index.html', {'airports': airports, 'error': 'Departure airport must be selected.'})
 
-    filters = {'depAirport': dep_airport}
-    q_objects = Q(depAirport=dep_airport)
+    filters = {'depAirportCode': dep_airport}
+    q_objects = Q(depAirportCode=dep_airport)
 
     if dep_date:
         dep_date_utc = get_tz_date(dep_date)
-        q_objects &= Q(depTimeUTC__date=dep_date_utc.date())
+        q_objects &= Q(depTime__date=dep_date_utc.date())
 
     if arr_date:
         arr_date_utc = get_tz_date(arr_date, 'Asia/Seoul')
-        q_objects &= Q(arrTimeUTC__date=arr_date_utc.date())
+        q_objects &= Q(arrTime__date=arr_date_utc.date())
 
     flights = CheapestFlight.objects.filter(q_objects)
-    # Apply timezone conversion to arrTimeUTC field for each flight
+    # Apply timezone conversion to arrTime field for each flight
     for flight in flights:
         try:
             dep_country_name = flight.depCountryName
             flight_dep_timezone = get_timezone_by_country(dep_country_name)
-            flight.depTimeUTC = flight.depTimeUTC.astimezone(flight_dep_timezone)
-            flight.arrTimeUTC = flight.arrTimeUTC.astimezone('Asia/Seoul')
+            flight.depTime = flight.depTime.astimezone(flight_dep_timezone)
+            flight.arrTime = flight.arrTime.astimezone('Asia/Seoul')
         except Exception as e:
-            print(f"Error converting timezone for flight {flight.flightID}: {e}")
+            print(f"Error converting timezone for flight {flight.id}: {e}")
 
     airport_info = AirportInformation.objects.get(airportCode=dep_airport)
-    exchange_rate = ExchangeRate.objects.filter(currency=airport_info.currency).first()
+    exchange_rate = ExchangeRate.objects.filter(currencyCode=airport_info.currencyCode).first()
 
     weather_data_date = arr_date if arr_date else dep_date
     weather_data = None
 
     if weather_data_date:
         weather_data_date_obj = datetime.strptime(weather_data_date, '%Y-%m-%d')
-        weather_data = Weather.objects.filter(tmKST__range=[weather_data_date_obj, weather_data_date_obj + timedelta(days=7)])
+        weather_data = Weather.objects.filter(tm__range=[weather_data_date_obj, weather_data_date_obj + timedelta(days=7)])
 
     context = {
         'airports': airports,

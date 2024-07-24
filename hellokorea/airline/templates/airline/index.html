@@ -5,11 +5,11 @@
   <div style="flex: 1">
     <form method="get" style="display: flex; flex-direction: column" action="{% url 'search_flights' %}">
       <div style="display: flex; margin-top: 5px; flex-direction: column;">
-      <label for="depAirports">Departure Airport</label>
-      <select id="depAirports" name="depAirports" required>
+      <label for="depAirportCodeCodes">Departure Airport</label>
+      <select id="depAirportCodes" name="depAirportCodes" required>
         <option value=""></option>
         {% for airport in airports %}
-        <option value="{{ airport.airportCode }}" {% if request.GET.depAirports == airport.airportCode %}selected{% endif %}>{{ airport.airportCode }}</option>
+        <option value="{{ airport.airportCode }}" {% if request.GET.depAirportCodes == airport.airportCode %}selected{% endif %}>{{ airport.airportCode }}</option>
         {% endfor %}
       </select>
     </div>
@@ -36,16 +36,16 @@
             <a href="{{ flight.url }}">Buy airline tickets >></a>
           </div>
           <div class="card-content">
-            <div class="card-details">{{ flight.carrier }}</div>
+            <div class="card-details">{{ flight.carrierName }}</div>
             <div class="card-details">
-              <span>{{ flight.depAirport }}</span><span>{{ flight.depTimeUTC }}</span>
+              <span>{{ flight.depAirportCode }}</span><span>{{ flight.depTime }}</span>
             </div>
             <div class="card-details"><span>-></span></div>
             <div class="card-details">
-              <span>{{ flight.arrAirport }}</span><span>{{ flight.arrTimeUTC }}</span>
+              <span>{{ flight.arrAirportCode }}</span><span>{{ flight.arrTime }}</span>
             </div>
             <div class="card-details">
-              <span>{{ flight.price|floatformat:0 }}</span><span>updated at : {{ flight.updatedAtKST }}</span>
+              <span>{{ flight.price|floatformat:0 }}</span><span>updated at : {{ flight.updatedAt }}</span>
             </div>
           </div>
         </div>
@@ -59,7 +59,7 @@
     <div class="er-box">
       <div class="date">
         <span class="day">Currency Unit</span>
-        <span class="day" style="margin-bottom: 10px;">{{ exchange_rate.currency }}</span>
+        <span class="day" style="margin-bottom: 10px;">{{ exchange_rate.currencyCode }}</span>
         <span class="date-num">Base Exchange Rate</span>
         <span class="date-num">{{ exchange_rate.standardRate|floatformat:0 }}</span>
       </div>
@@ -75,8 +75,8 @@
       {% for weather in weather_data %}
       <div class="weather-item">
         <div class="date">
-          <span class="day">{{ weather.tmKST|date:"D" }}</span>
-          <span class="date-num">{{ weather.tmKST }}</span>
+          <span class="day">{{ weather.tm|date:"D" }}</span>
+          <span class="date-num">{{ weather.tm }}</span>
         </div>
         <div class="weather">
           <div class="precipitation"><img
