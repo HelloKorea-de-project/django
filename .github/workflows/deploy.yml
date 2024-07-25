@@ -48,6 +48,8 @@ jobs:
                 "cd /home/ubuntu/django/hellokorea", 
                 "python manage.py makemigrations", 
                 "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)", 
+                "echo \"$MIGRATE_OUTPUT\"", 
+                "[[ \"$MIGRATE_OUTPUT\" == *'Running migrations'* && \"$MIGRATE_OUTPUT\" != *'UnicodeDecodeError'* && \"$MIGRATE_OUTPUT\" != *'MigrationSchemaMissing'* ]] || { echo 'Migration failed'; exit 1; }", 
 
                 "# 5. Recollect statics on EC2", 
                 "python manage.py collectstatic --noinput", 
