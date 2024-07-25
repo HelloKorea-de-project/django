@@ -33,6 +33,9 @@ jobs:
 
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
+                "python3 -m venv venv",
+                "source venv/bin/activate",
+                
                 "git pull origin main", 
 
                 "# 2. Update dependencies on EC2", 
