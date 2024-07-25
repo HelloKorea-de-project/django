@@ -27,29 +27,7 @@ jobs:
             --instance-ids "i-06c2710555d918074" \
             --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
-            --parameters 'commands=["set -e", 
-                "# 1. Pull latest code on EC2", 
-                "cd /home/ubuntu/django", 
-                "git pull origin main", 
-
-                "# 2. Update dependencies on EC2", 
-                "pipenv install -r requirements.txt", 
-
-                "# 3. Update .env from S3 on EC2", 
-                "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
-
-                "# 4. Update Django migrations & Check RDS online status on EC2", 
-                "pipenv shell", 
-                "cd /home/ubuntu/django/hellokorea", 
-                "python manage.py makemigrations", 
-                "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)", 
-                
-                "# 5. Recollect statics on EC2", 
-                "python manage.py collectstatic --noinput", 
-
-                "# 6. Restart Gunicorn on EC2", 
-                "exit", 
-                "sudo systemctl restart gunicorn"]' \
+            --parameters 'commands=["echo 1"]' \
             --timeout-seconds 600
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
