@@ -28,8 +28,9 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
             --parameters 'commands=["set -e", 
+                "export HOME=/home/ubuntu",
                 "git config --global --add safe.directory /home/ubuntu/django",
-                
+
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
                 "git pull origin main", 
