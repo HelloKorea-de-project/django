@@ -28,6 +28,8 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
             --parameters 'commands=["set -e", 
+                "git config --global --add safe.directory /home/ubuntu/django",
+                
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
                 "git pull origin main", 
@@ -36,6 +38,7 @@ jobs:
                 "pipenv install -r requirements.txt", 
 
                 "# 3. Update .env from S3 on EC2", 
+                "sudo apt-get install -y awscli",
                 "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
                 "# 4. Update Django migrations & Check RDS online status on EC2", 
@@ -43,7 +46,7 @@ jobs:
                 "cd /home/ubuntu/django/hellokorea", 
                 "python manage.py makemigrations", 
                 "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)", 
-                
+
                 "# 5. Recollect statics on EC2", 
                 "python manage.py collectstatic --noinput", 
 
