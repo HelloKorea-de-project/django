@@ -40,6 +40,9 @@ jobs:
 
                 "# 3. Update .env from S3 on EC2", 
                 "sudo apt-get install -y awscli",
+                "aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID",
+                "aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY",
+                "aws configure set region $AWS_DEFAULT_REGION",
                 "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
                 "# 4. Update Django migrations & Check RDS online status on EC2", 
