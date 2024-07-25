@@ -33,7 +33,7 @@ jobs:
 
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
-                "source venv/bin/activate",
+                ". venv/bin/activate",
 
                 "git pull origin main", 
 
