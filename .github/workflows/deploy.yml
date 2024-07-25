@@ -27,7 +27,7 @@ jobs:
             --instance-ids "i-06c2710555d918074" \
             --document-name "SSM-SessionManagerRunShell" \
             --comment "Updating Django application" \
-            --parameters commands=["set -e", \
+            --parameters '{"commands":["set -e", \
                 "# 1. Pull latest code on EC2", \
                 "cd /home/ubuntu/django", \
                 "git pull origin main", \
@@ -46,7 +46,7 @@ jobs:
                 "python manage.py collectstatic --noinput", \
                 "# 6. Restart Gunicorn on EC2", \
                 "exit", \
-                "sudo systemctl restart gunicorn"] \
+                "sudo systemctl restart gunicorn"]}' \
             --timeout-seconds 600
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
