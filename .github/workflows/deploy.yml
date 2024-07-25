@@ -27,35 +27,33 @@ jobs:
             --instance-ids "i-06c2710555d918074" \
             --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
-            --parameters --parameters '{"commands":[
-                "set -e", 
+            --parameters commands=["set -e", 
                 "export HOME=/home/ubuntu",
                 "git config --global --add safe.directory /home/ubuntu/django",
-                "# 1. Pull latest code on EC2",
-                "cd /home/ubuntu/django",
-                "git pull origin main",
-                "# 2. Create virtual environment",
-                "sudo apt-get install -y python3-venv", 
-                "python3 -m venv venv",
+
+                "# 1. Pull latest code on EC2", 
+                "cd /home/ubuntu/django", 
                 ". venv/bin/activate",
-                "# 3. Update dependencies in virtual environment",
-                "pip install -r requirements.txt",
-                "# 4. Configure AWS CLI",
-                "aws configure set aws_access_key_id \\"$AWS_ACCESS_KEY_ID\\"",
-                "aws configure set aws_secret_access_key \\"$AWS_SECRET_ACCESS_KEY\\"",
-                "aws configure set region \\"$AWS_DEFAULT_REGION\\"",
-                "# 5. Update .env from S3 on EC2",
-                "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production",
-                "# 6. Update Django migrations & Check RDS online status on EC2",
-                "python manage.py makemigrations",
-                "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)",
-                "echo \\"$MIGRATE_OUTPUT\\"", 
-                "[[ \\"$MIGRATE_OUTPUT\\" == *\'Running migrations\'* && \\"$MIGRATE_OUTPUT\\" != *\'UnicodeDecodeError\'* && \\"$MIGRATE_OUTPUT\\" != *\'MigrationSchemaMissing\'* ]] || { echo \'Migration failed\'; exit 1; }", 
-                "# 7. Recollect statics on EC2",
+
+                "git pull origin main", 
+
+                "# 2. Update dependencies on EC2", 
+                "pip install -r requirements.txt", 
+
+                "# 3. Update .env from S3 on EC2", 
+                "pip install awscli",
+                "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
+
+                "# 4. Update Django migrations & Check RDS online status on EC2", 
+                "cd /home/ubuntu/django/hellokorea", 
+                "python manage.py makemigrations", 
+                "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)", 
+
+                "# 5. Recollect statics on EC2", 
                 "python manage.py collectstatic --noinput", 
-                "# 8. Restart Gunicorn on EC2", 
-                "sudo systemctl restart gunicorn", 
-                "echo \\"Command completed successfully\\"" ]}' \
+
+                "# 6. Restart Gunicorn on EC2", 
+                "sudo systemctl restart gunicorn"]' \
             --timeout-seconds 600
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
