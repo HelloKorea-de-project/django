@@ -53,7 +53,7 @@ jobs:
                 "python manage.py collectstatic --noinput", 
 
                 "# 6. Restart Gunicorn on EC2", 
-                "sudo systemctl restart gunicorn"]' \
+                "sudo systemctl restart gunicorn"] \
             --timeout-seconds 600
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
