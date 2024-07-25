@@ -39,7 +39,7 @@ jobs:
                 "pipenv install -r requirements.txt", 
 
                 "# 3. Update .env from S3 on EC2", 
-                "sudo apt-get install -y awscli",
+                "pip install awscli",
                 "aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID",
                 "aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY",
                 "aws configure set region $AWS_DEFAULT_REGION",
