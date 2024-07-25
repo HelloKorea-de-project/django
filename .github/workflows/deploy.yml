@@ -46,13 +46,12 @@ jobs:
                 "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
                 "# 4. Update Django migrations & Check RDS online status on EC2", 
-                "pipenv shell", 
                 "cd /home/ubuntu/django/hellokorea", 
-                "python manage.py makemigrations", 
-                "MIGRATE_OUTPUT=$(python manage.py migrate 2>&1)", 
+                "pipenv run python manage.py makemigrations", 
+                "MIGRATE_OUTPUT=$(pipenv run python manage.py migrate 2>&1)", 
 
                 "# 5. Recollect statics on EC2", 
-                "python manage.py collectstatic --noinput", 
+                "pipenv run python manage.py collectstatic --noinput", 
 
                 "# 6. Restart Gunicorn on EC2", 
                 "exit", 
