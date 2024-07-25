@@ -25,7 +25,7 @@ jobs:
         run: |
           aws ssm send-command \
             --instance-ids "i-06c2710555d918074" \
-            --document-name "SSM-SessionManagerRunShell" \
+            --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
             --parameters '{"commands":["set -e", 
                 "# 1. Pull latest code on EC2", 
