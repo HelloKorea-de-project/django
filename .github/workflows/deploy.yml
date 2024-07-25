@@ -53,7 +53,7 @@ jobs:
 
                 "# 6. Restart Gunicorn on EC2",
                 "exit",
-                "sudo systemctl restart gunicorn"
+                "sudo systemctl restart gunicorn",
             ] \
             --timeout-seconds 600
         env:
