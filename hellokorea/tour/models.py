@@ -1,9 +1,9 @@
 from django.db import models
 
 class TourismServiceCategory(models.Model):
-    cat3 = models.CharField(max_length=255, primary_key=True)
-    cat2 = models.CharField(max_length=255, null=False)
-    cat1 = models.CharField(max_length=255, null=False)
+    cat3 = models.CharField(max_length=255, primary_key=True, default='common')
+    cat2 = models.CharField(max_length=255, null=False, default='common')
+    cat1 = models.CharField(max_length=255, null=False, default='common')
     contentTypeName = models.CharField(max_length=255, null=True)
     contentTypeID = models.CharField(max_length=255, null=True)
     mainCategory = models.CharField(max_length=255, null=False)
