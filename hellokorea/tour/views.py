@@ -2,7 +2,12 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from .models import *
 from django.db.models import Count
+import deepl
+from django.conf import settings
+import asyncio
 
+translator = deepl.Translator(settings.DEEPL_API_KEY)
+translate_dict = {}
 
 def index(request):
     return render(request, 'tour/index.html')
@@ -19,12 +24,19 @@ def district_detail(request, district_name):
 
     district_korName = SeoulAreaCode.objects.get(name=district_name).korName
 
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+
+    translated_main_categories = loop.run_until_complete(asyncio.gather(*[translate_text(category) for category in main_categories]))
+    translated_genres = loop.run_until_complete(asyncio.gather(*[translate_text(genre, field_name='genrenm') for genre in genres]))
+    translated_lodging_types = loop.run_until_complete(asyncio.gather(*[translate_text(lodging_type, field_name='uptaenm') for lodging_type in lodging_types]))
+
     context = {
         'district_name': district_name,
         'district_korName': district_korName,
-        'main_categories': main_categories,
-        'genres': genres,
-        'lodging_types': lodging_types
+        'main_categories': translated_main_categories,
+        'genres': translated_genres,
+        'lodging_types': translated_lodging_types
     }
     return render(request, 'tour/district_detail.html', context)
 
@@ -140,13 +152,31 @@ def get_events(request, district_name):
     elif end_date:
         events = events.filter(eventEnd__gte=end_date)
     if genre:
-        events = events.filter(genrenm=genre)
+        events = events.filter(genrenm=translate_dict[genre])
 
     events = list(events)
-    return JsonResponse({'events': events})
+
+    async def translate_event(event):
+        return {
+            'poster': event['poster'],
+            'prfnm': await translate_text(event['prfnm']),
+            'genrenm': await translate_text(event['genrenm'], field_name='genrenm'),
+            'eventStart': event['eventStart'],
+            'eventEnd': event['eventEnd'],
+            'seatPrice': await translate_text(event['seatPrice']),
+            'mt10id__adres': await translate_text(event['mt10id__adres']),
+            'mt10id__la': event['mt10id__la'],
+            'mt10id__lo': event['mt10id__lo'],
+        }
+
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
+
+    return JsonResponse({'events': translated_events})
 
 def get_lodgings(request, district_name):
-    uptaenms = request.GET.get('uptaenms')
+    uptaenm = request.GET.get('uptaenms')
 
     # Fetch the SeoulAreaCode based on the district_name
     area_code = SeoulAreaCode.objects.get(name=district_name).code
@@ -154,11 +184,32 @@ def get_lodgings(request, district_name):
     lodgings = Lodging.objects.filter(addCode=area_code).values(
         'mgtno', 'rdnwhladdr', 'bplcnm', 'uptaenm', 'lo', 'la'
     )
-    if uptaenms:
-        lodgings = lodgings.filter(uptaenm=uptaenms)
+    if uptaenm:
+        lodgings = lodgings.filter(uptaenm=translate_dict[uptaenm])
 
     lodgings = list(lodgings)
-    return JsonResponse({'lodgings': lodgings})
+
+    async def translate_lodging(lodging):
+        return {
+            'mgtno': lodging['mgtno'],
+            'rdnwhladdr': await translate_text(lodging['rdnwhladdr']),
+            'bplcnm': await translate_text(lodging['bplcnm']),
+            'uptaenm': await translate_text(lodging['uptaenm'], field_name='uptaenm'),
+            'lo': lodging['lo'],
+            'la': lodging['la'],
+        }
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
+
+    return JsonResponse({'lodgings': translated_lodgings})
+
+async def translate_text(text, target_language='EN-US', field_name=None):
+    result = translator.translate_text(text, target_lang=target_language)
+    if field_name == 'uptaenm' or field_name == 'genrenm':
+        translate_dict[result.text] = text
+    return result.text
 
 # def filter_data(request, district_name):
 #     if request.method == "GET":

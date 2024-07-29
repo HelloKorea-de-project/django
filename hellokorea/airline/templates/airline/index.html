@@ -76,7 +76,18 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+  flatpickr("#depDate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
+  flatpickr("#arrDate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
   function resetFilters() {
       const url = new URL(window.location.href);
       url.search = '';  // Remove all query parameters

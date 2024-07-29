@@ -27,8 +27,8 @@
         <div class="head-section">
           <h2>Events</h2>
           <div class="filter-container">
-            <input type="date" id="startdate" name="startdate" />
-            <input type="date" id="enddate" name="enddate" />
+            <input type="date" id="startdate" name="startdate" lang="en" />
+            <input type="date" id="enddate" name="enddate" lang="en" />
             <select id="genrenms" name="genrenms">
               <option value="">All</option>
               {% for genre in genres %}
@@ -179,7 +179,18 @@
   type="text/javascript"
   src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId={{ NAVER_MAPS_API_KEY }}&submodules=geocoder&language=en"
 ></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+  flatpickr("#startdate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
+  flatpickr("#enddate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     var districtName = "{{ district_name }}";
     var districtKorName = "{{ district_korName }}";
@@ -330,7 +341,7 @@
       var card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${imageSrc}" alt="이미지" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x150';" />
+        <img src="${imageSrc}" alt="image" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x150';" />
         <div class="card-content">
           <div class="card-title">${title}</div>
           <div class="card-details">${details}</div>
