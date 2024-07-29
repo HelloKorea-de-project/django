@@ -21,34 +21,33 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y awscli
 
+      - name: Create deployment script
+        run: |
+          echo '#!/bin/bash' > deploy.sh
+          echo 'set -e' >> deploy.sh
+          echo 'export HOME=/home/ubuntu' >> deploy.sh
+          echo 'git config --global --add safe.directory /home/ubuntu/django' >> deploy.sh
+          echo '# 1. Pull latest code on EC2' >> deploy.sh
+          echo 'cd /home/ubuntu/django' >> deploy.sh
+          echo '. venv/bin/activate' >> deploy.sh
+          echo 'git pull origin main' >> deploy.sh
+          echo '# 3. Update .env from S3 on EC2' >> deploy.sh
+          echo 'sudo pip install awscli' >> deploy.sh
+          echo 'aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production' >> deploy.sh
+          echo '# 4. Recollect statics on EC2' >> deploy.sh
+          echo 'cd /home/ubuntu/django/hellokorea' >> deploy.sh
+          echo 'python manage.py collectstatic --noinput' >> deploy.sh
+          echo '# 5. Restart Gunicorn on EC2' >> deploy.sh
+          echo 'sudo systemctl restart gunicorn' >> deploy.sh
+          chmod +x deploy.sh
+
       - name: Deploy to EC2
         run: |
           aws ssm send-command \
             --instance-ids "i-06c2710555d918074" \
             --document-name "AWS-RunShellScript" \
             --comment "Updating Django application" \
-            --parameters 'commands=["set -e", 
-                "export HOME=/home/ubuntu",
-                "git config --global --add safe.directory /home/ubuntu/django",
-
-                "# 1. Pull latest code on EC2", 
-                "cd /home/ubuntu/django", 
-                ". venv/bin/activate",
-
-                "git pull origin main", 
-
-
-
-                "# 3. Update .env from S3 on EC2", 
-                "sudo pip install awscli",
-                "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
-
-                "# 4. Recollect statics on EC2", 
-                "cd /home/ubuntu/django/hellokorea", 
-                "python manage.py collectstatic --noinput", 
-
-                "# 5. Restart Gunicorn on EC2", 
-                "sudo systemctl restart gunicorn"]' \
+            --parameters 'commands=["/home/ubuntu/deploy.sh"]' \
             --timeout-seconds 600
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
