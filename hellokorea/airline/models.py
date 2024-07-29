@@ -1,21 +1,21 @@
 from django.db import models
 
 class AirportInformation(models.Model):
-    airportCode = models.CharField(max_length=10, unique=True, null=False)
+    airportCode = models.CharField(max_length=10, primary_key=True)
     countryCode = models.CharField(max_length=10, null=False)
     currencyCode = models.CharField(max_length=10, null=False)
     createdAt = models.DateTimeField(auto_now_add=True, null=False)
     updatedAt = models.DateTimeField(auto_now=True, null=False)
 
 class ServiceAirportICN(models.Model):
-    airportCode = models.CharField(max_length=10, unique=True, null=False)
+    airportCode = models.CharField(max_length=10, primary_key=True)
     countryCode = models.CharField(max_length=10, null=False)
     currencyCode = models.CharField(max_length=10, null=False)
     createdAt = models.DateTimeField(auto_now_add=True, null=False)
     updatedAt = models.DateTimeField(auto_now=True, null=False)
     
 class ArrCountToICN(models.Model):
-    airportCode = models.CharField(max_length=10, unique=True, null=False)
+    airportCode = models.CharField(max_length=10, primary_key=True)
     count = models.IntegerField(null=False, default=0)
     createdAt = models.DateTimeField(auto_now_add=True, null=False)
     updatedAt = models.DateTimeField(auto_now=True, null=False)
