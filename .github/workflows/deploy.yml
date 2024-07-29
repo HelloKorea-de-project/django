@@ -30,24 +30,24 @@ jobs:
             --parameters 'commands=["set -e", 
                 "sudo chown -R ubuntu:ubuntu /home/ubuntu/django",
                 "export HOME=/home/ubuntu",
-                "git config --global --add safe.directory /home/ubuntu/django",
+                "sudo git config --global --add safe.directory /home/ubuntu/django",
 
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
                 ". venv/bin/activate",
 
-                "git pull origin main", 
+                "sudo git pull origin main", 
 
                 "# 2. Update dependencies on EC2", 
-                "pip install -r requirements.txt", 
+                "sudo pip install -r requirements.txt", 
 
                 "# 3. Update .env from S3 on EC2", 
-                "pip install awscli",
-                "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
+                "sudo pip install awscli",
+                "sudo aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
                 "# 4. Recollect statics on EC2", 
                 "cd /home/ubuntu/django/hellokorea", 
-                "python manage.py collectstatic --noinput", 
+                "sudo python manage.py collectstatic --noinput", 
 
                 "# 5. Restart Gunicorn on EC2", 
                 "sudo systemctl restart gunicorn"]' \
