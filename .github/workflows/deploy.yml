@@ -38,7 +38,7 @@ jobs:
                 "git pull origin main", 
 
                 "# 2. Update dependencies on EC2", 
-                "pip install -r requirements.txt", 
+                "pip install --no-cache-dir -r requirements.txt", 
 
                 "# 3. Update .env from S3 on EC2", 
                 "pip install awscli",
