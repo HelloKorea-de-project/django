@@ -29,8 +29,8 @@ jobs:
             --comment "Updating Django application" \
             --parameters 'commands=["set -e", 
                 "sudo chown -R ubuntu:ubuntu /home/ubuntu/django",
-                "sudo -u ubuntu -i export HOME=/home/ubuntu",
-                "sudo -u ubuntu -i git config --global --add safe.directory /home/ubuntu/django",
+                "export HOME=/home/ubuntu",
+                "git config --global --add safe.directory /home/ubuntu/django",
 
                 "# 1. Pull latest code on EC2", 
                 "cd /home/ubuntu/django", 
