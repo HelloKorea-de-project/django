@@ -44,16 +44,11 @@ jobs:
                 "pip install awscli",
                 "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
-                # "# 4. Update Django migrations & Check RDS online status on EC2", 
-                # "cd /home/ubuntu/django/hellokorea", 
-                # "python manage.py makemigrations --noinput", 
-                # "python manage.py migrate --noinput",
-
-                "# 5. Recollect statics on EC2", 
+                "# 4. Recollect statics on EC2", 
                 "cd /home/ubuntu/django/hellokorea", 
                 "python manage.py collectstatic --noinput", 
 
-                "# 6. Restart Gunicorn on EC2", 
+                "# 5. Restart Gunicorn on EC2", 
                 "sudo systemctl restart gunicorn"]' \
             --timeout-seconds 600
         env:
