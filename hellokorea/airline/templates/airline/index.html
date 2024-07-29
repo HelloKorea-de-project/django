@@ -9,7 +9,7 @@
       <select id="depAirportCodes" name="depAirportCodes" required>
         <option value=""></option>
         {% for airport in airports %}
-        <option value="{{ airport.airportCode }}" {% if request.GET.depAirportCodes == airport.airportCode %}selected{% endif %}>{{ airport.airportCode }}</option>
+        <option value="{{ airport.depAirportCode }}" {% if request.GET.depAirportCodes == airport.depAirportCode %}selected{% endif %}>{{ airport.depAirportCode }}</option>
         {% endfor %}
       </select>
     </div>
@@ -28,30 +28,10 @@
   </div>
 
   <div class="list-container">
-    <div class="scroll-container">
-      <div class="card-container">
-        {% for flight in flights %}
-        <div class="card">
-          <div class="card-subcontent">
-            <a href="{{ flight.url }}">Buy airline tickets >></a>
-          </div>
-          <div class="card-content">
-            <div class="card-details">{{ flight.carrierName }}</div>
-            <div class="card-details">
-              <span>{{ flight.depAirportCode }}</span><span>{{ flight.depTime }}</span>
-            </div>
-            <div class="card-details"><span>-></span></div>
-            <div class="card-details">
-              <span>{{ flight.arrAirportCode }}</span><span>{{ flight.arrTime }}</span>
-            </div>
-            <div class="card-details">
-              <span>{{ flight.price|floatformat:0 }}</span><span>updated at : {{ flight.updatedAt }}</span>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
+    <div class="scroll-container" id="flight-list">
+      {% include 'airline/flight_list.html' %}
     </div>
+    <div id="loading" style="display: none;">Loading...</div>
   </div>
 
   <div style="flex: 2">
@@ -96,12 +76,78 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+  flatpickr("#depDate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
+  flatpickr("#arrDate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
   function resetFilters() {
       const url = new URL(window.location.href);
       url.search = '';  // Remove all query parameters
       window.location.href = url.toString();  // Redirect to the URL without query parameters
   }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    let page = 1;
+    const flightList = document.getElementById('flight-list');
+    const scrollContainer = document.querySelector('.scroll-container');
+    const loading = document.getElementById('loading');
+    let loadingInProgress = false;
+
+    const loadMoreFlights = () => {
+      if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 200) {
+        if (!loadingInProgress) {
+          loadingInProgress = true;
+          page++;
+          loading.style.display = 'block';
+
+          fetch(`?page=${page}`, {
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.text();
+          })
+          .then(text => {
+            try {
+              const data = JSON.parse(text);
+              loading.style.display = 'none';
+              loadingInProgress = false;
+              if (data.html) {
+                flightList.insertAdjacentHTML('beforeend', data.html);
+              }
+              // if (data.end) {
+              //   loadingInProgress = true;
+              // }
+            } catch (error) {
+              console.error('Error parsing JSON:', error);
+              console.error('Response text was:', text);
+              loading.style.display = 'none';
+              loadingInProgress = true;
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching more flights:', error);
+            loading.style.display = 'none';
+            loadingInProgress = true;
+          });
+        }
+      }
+    };
+
+     scrollContainer.addEventListener('scroll', loadMoreFlights);
+  });
   </script>
 
 <style>
@@ -128,6 +174,8 @@
     height: 100vh;
     flex: 6;
     justify-content: center;
+    align-items: center;
+    flex-direction: column;
   }
   .scroll-container {
     max-height: 100%; /* 스크롤 가능한 최대 높이 설정 */
@@ -135,6 +183,16 @@
     width: 100%;
     padding: 10px;
   }
+  
+  #loading {
+    align-items: center;
+    justify-content: center;
+    background-color:lightgray;
+    width: 50%;
+    border-radius: 10px;
+    text-align: center;
+  }
+
   .card-container {
     display: flex;
     flex-direction: column; /* 카드들을 세로로 나열 */

@@ -25,10 +25,10 @@
       </div>
       <div class="theme-container">
         <div class="head-section">
-          <h2>Performances/Festivals</h2>
+          <h2>Events</h2>
           <div class="filter-container">
-            <input type="date" id="startdate" name="startdate" />
-            <input type="date" id="enddate" name="enddate" />
+            <input type="date" id="startdate" name="startdate" lang="en" />
+            <input type="date" id="enddate" name="enddate" lang="en" />
             <select id="genrenms" name="genrenms">
               <option value="">All</option>
               {% for genre in genres %}
@@ -38,7 +38,7 @@
           </div>
         </div>
         <div class="scroll-container">
-          <div class="card-container" id="performances-container">
+          <div class="card-container" id="events-container">
             <!-- Cards will be appended here -->
           </div>
         </div>
@@ -86,7 +86,6 @@
   .content-container {
     position: relative;
     width: 85%;
-    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -98,7 +97,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 30px;
+    gap: 80px;
     margin-left: 50px;
   }
 
@@ -113,7 +112,8 @@
   }
   .card {
     background-color: #fff;
-    width: 200px;
+    width: 250px;
+    height: 300px;
     margin: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -122,18 +122,34 @@
   }
   .card img {
     width: 100%;
-    height: auto;
+    height: 60%;
+    object-fit: cover;
   }
   .card-content {
-    padding: 16px;
+    padding: 10px;
   }
   .card-title {
     font-size: 18px;
     margin-bottom: 8px;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-wrap: break-word;
   }
   .card-details {
     font-size: 14px;
     color: #666;
+    width: 100%;
+    height: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-wrap: break-word;
   }
   .theme-container {
     width: 90%;
@@ -163,7 +179,18 @@
   type="text/javascript"
   src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId={{ NAVER_MAPS_API_KEY }}&submodules=geocoder&language=en"
 ></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
+  flatpickr("#startdate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
+  flatpickr("#enddate", {
+    dateFormat: "Y-m-d",
+    locale: "en",
+  });
+
   document.addEventListener("DOMContentLoaded", function () {
     var districtName = "{{ district_name }}";
     var districtKorName = "{{ district_korName }}";
@@ -188,10 +215,10 @@
         updateAttractions(data.tour_infos);
       });
 
-    fetch(`/tour/district/${districtName}/performances/`)
+    fetch(`/tour/district/${districtName}/events/`)
       .then((response) => response.json())
       .then((data) => {
-        updatePerformances(data.performances);
+        updateEvents(data.events);
       });
 
     fetch(`/tour/district/${districtName}/lodgings/`)
@@ -210,15 +237,15 @@
     document
       .getElementById("startdate")
       .addEventListener("change", function () {
-        fetchPerformances();
+        fetchevents();
       });
 
     document.getElementById("enddate").addEventListener("change", function () {
-      fetchPerformances();
+      fetchevents();
     });
 
     document.getElementById("genrenms").addEventListener("change", function () {
-      fetchPerformances();
+      fetchevents();
     });
 
     document.getElementById("uptaenms").addEventListener("change", function () {
@@ -236,16 +263,16 @@
         });
     }
 
-    function fetchPerformances() {
+    function fetchevents() {
       var startDate = document.getElementById("startdate").value;
       var endDate = document.getElementById("enddate").value;
       var genre = document.getElementById("genrenms").value;
-      var url = `/tour/district/${districtName}/performances/?start_date=${startDate}&end_date=${endDate}&genre=${genre}`;
+      var url = `/tour/district/${districtName}/events/?start_date=${startDate}&end_date=${endDate}&genre=${genre}`;
 
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          updatePerformances(data.performances);
+          updateEvents(data.events);
         });
     }
 
@@ -269,7 +296,7 @@
         var card = createCard(
           info.firstImage,
           info.title,
-          `${info.contentTypeID__subCategory1}(${info.contentTypeID__subCategory2})`,
+          `${info.cat3__subCategory1}(${info.cat3__subCategory2})`,
           info.addr,
           info.la,
           info.lo
@@ -278,21 +305,19 @@
       });
     }
 
-    function updatePerformances(performances) {
-      var performancesContainer = document.getElementById(
-        "performances-container"
-      );
-      performancesContainer.innerHTML = "";
-      performances.forEach((info) => {
+    function updateEvents(events) {
+      var eventsContainer = document.getElementById("events-container");
+      eventsContainer.innerHTML = "";
+      events.forEach((info) => {
         var card = createCard(
           info.poster,
           info.prfnm,
-          `${info.genrenm}, ${info.prfpdfrom} - ${info.prfpdto}, ${info.pcseguidance}`,
+          `${info.genrenm}, ${info.eventStart} - ${info.eventEnd}, ${info.seatPrice}`,
           info.mt10id__adres,
           info.mt10id__la,
           info.mt10id__lo
         );
-        performancesContainer.appendChild(card);
+        eventsContainer.appendChild(card);
       });
     }
 
@@ -316,7 +341,7 @@
       var card = document.createElement("div");
       card.className = "card";
       card.innerHTML = `
-        <img src="${imageSrc}" alt="이미지" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x150';" />
+        <img src="${imageSrc}" alt="image" onerror="this.onerror=null;this.src='https://via.placeholder.com/200x150';" />
         <div class="card-content">
           <div class="card-title">${title}</div>
           <div class="card-details">${details}</div>

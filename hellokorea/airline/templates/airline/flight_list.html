@@ -1,0 +1,25 @@
+<div class="card-container">
+  {% for flight in flights %}
+  <div class="card">
+    <div class="card-subcontent">
+      <a href="{{ flight.url }}">Buy airline tickets >></a>
+    </div>
+    <div class="card-content">
+      <div class="card-details">{{ flight.carrierName }}</div>
+      <div class="card-details">
+        <span>{{ flight.depAirportCode }}</span
+        ><span>{{ flight.depTime }}</span>
+      </div>
+      <div class="card-details"><span>-></span></div>
+      <div class="card-details">
+        <span>{{ flight.arrAirportCode }}</span
+        ><span>{{ flight.arrTime }}</span>
+      </div>
+      <div class="card-details">
+        <span>{{ flight.price|floatformat:0 }}</span
+        ><span>updated at : {{ flight.updatedAt }}</span>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
