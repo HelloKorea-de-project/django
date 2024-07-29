@@ -29,4 +29,3 @@ class Weather(models.Model):
     maxTa = models.FloatField(null=True)
     sumRn = models.FloatField(null=True)
     createdAt = models.DateTimeField(auto_now_add=True, null=False)
-    updatedAt = models.DateTimeField(auto_now=True, null=False)
