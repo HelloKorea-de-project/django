@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False)
 )
-environ.Env.read_env(os.path.join(BASE_DIR, '.env.production'))  # .env 파일 읽기
+environ.Env.read_env(os.path.join(BASE_DIR, '.env.dev'))  # .env 파일 읽기
 
 
 # Quick-start development settings - unsuitable for production

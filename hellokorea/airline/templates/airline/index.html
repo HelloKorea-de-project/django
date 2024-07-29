@@ -9,7 +9,7 @@
       <select id="depAirportCodes" name="depAirportCodes" required>
         <option value=""></option>
         {% for airport in airports %}
-        <option value="{{ airport.airportCode }}" {% if request.GET.depAirportCodes == airport.airportCode %}selected{% endif %}>{{ airport.airportCode }}</option>
+        <option value="{{ airport.depAirportCode }}" {% if request.GET.depAirportCodes == airport.depAirportCode %}selected{% endif %}>{{ airport.depAirportCode }}</option>
         {% endfor %}
       </select>
     </div>

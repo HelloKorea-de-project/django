@@ -514,7 +514,7 @@
         <h3 id="district-name">Seoul Map Highlights</h3>
         <p id="district-info">
           <span id="max-tourism-info"></span><br />
-          <span id="max-performance-info"></span><br />
+          <span id="max-event-info"></span><br />
           <span id="max-lodging-info"></span>
         </p>
       </div>
@@ -594,39 +594,39 @@
     const districtName = document.getElementById("district-name");
     const districtInfo = document.getElementById("district-info");
     const maxTourismInfo = document.getElementById("max-tourism-info");
-    const maxPerformanceInfo = document.getElementById("max-performance-info");
+    const maxEventInfo = document.getElementById("max-event-info");
     const maxLodgingInfo = document.getElementById("max-lodging-info");
 
     addColoredCircle("max-tourism-info", "#ffcc00"); // 빨간색 원
-    addColoredCircle("max-performance-info", "#66ccff"); // 초록색 원
+    addColoredCircle("max-event-info", "#66ccff"); // 초록색 원
     addColoredCircle("max-lodging-info", "#ff6699"); // 파란색 원
 
     fetch("{% url 'get_district_info' %}")
       .then((response) => response.json())
       .then((data) => {
         const maxTourism = data["max_tourism"];
-        const maxPerformance = data["max_performance"];
+        const maxEvent = data["max_event"];
         const maxLodging = data["max_lodging"];
         delete data["max_tourism"];
-        delete data["max_performance"];
+        delete data["max_event"];
         delete data["max_lodging"];
 
         // Display initial highlights in the info box
         maxTourismInfo.textContent = `District with most tourisms: ${maxTourism}`;
-        maxPerformanceInfo.textContent = `District with most performances: ${maxPerformance}`;
+        maxEventInfo.textContent = `District with most events: ${maxEvent}`;
         maxLodgingInfo.textContent = `District with most lodgings: ${maxLodging}`;
 
         document.querySelectorAll("#seoul-map path").forEach(function (path) {
           const districtId = path.id;
           if (data[districtId]) {
             const tourism = data[districtId].tourism || 0;
-            const performance = data[districtId].performance || 0;
+            const event = data[districtId].event || 0;
             const lodgingCount = data[districtId].lodging_count || 0;
 
             // Determine color based on max data
             let color = "#f6eddb";
             if (districtId === maxTourism) color = "#ffcc00";
-            if (districtId === maxPerformance) color = "#66ccff";
+            if (districtId === maxEvent) color = "#66ccff";
             if (districtId === maxLodging) color = "#ff6699";
 
             path.style.fill = color;
@@ -635,7 +635,7 @@
               path.setAttribute("data-original-fill", path.style.fill); // Save original fill color
               path.style.fill = "#f6eddb80"; // Change fill color on hover
               districtName.textContent = districtId;
-              districtInfo.textContent = `Tourism: ${tourism}, Performance: ${performance}, Lodging Count: ${lodgingCount}`;
+              districtInfo.textContent = `Tourism: ${tourism}, Event: ${event}, Lodging: ${lodgingCount}`;
               infoBox.style.display = "block";
             });
 
@@ -643,12 +643,12 @@
               path.style.fill = path.getAttribute("data-original-fill"); // Restore original fill color
               districtName.textContent = "Seoul Map Highlights";
               districtInfo.innerHTML = `<span id="max-tourism-info">${maxTourismInfo.textContent}</span><br>
-										  <span id="max-performance-info">${maxPerformanceInfo.textContent}</span><br>
+										  <span id="max-event-info">${maxEventInfo.textContent}</span><br>
 										  <span id="max-lodging-info">${maxLodgingInfo.textContent}</span>`;
               infoBox.style.display = "block";
 
               addColoredCircle("max-tourism-info", "#ffcc00"); // 빨간색 원
-              addColoredCircle("max-performance-info", "#66ccff"); // 초록색 원
+              addColoredCircle("max-event-info", "#66ccff"); // 초록색 원
               addColoredCircle("max-lodging-info", "#ff6699"); // 파란색 원
             });
 
