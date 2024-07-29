@@ -1,7 +1,11 @@
 from django.db import models
 
 class TourismServiceCategory(models.Model):
-    contentTypeID = models.CharField(max_length=255, primary_key=True)
+    cat3 = models.CharField(max_length=255, primary_key=True)
+    cat2 = models.CharField(max_length=255, null=False)
+    cat1 = models.CharField(max_length=255, null=False)
+    contentTypeName = models.CharField(max_length=255, null=True)
+    contentTypeID = models.CharField(max_length=255, null=True)
     mainCategory = models.CharField(max_length=255, null=False)
     subCategory1 = models.CharField(max_length=255, null=False)
     subCategory2 = models.CharField(max_length=255, null=False)
@@ -13,7 +17,7 @@ class SeoulAreaCode(models.Model):
 
 class SeoulTourInfo(models.Model):
     contentID = models.CharField(max_length=255, primary_key=True)
-    contentTypeID = models.ForeignKey(TourismServiceCategory, on_delete=models.CASCADE)
+    cat3 = models.ForeignKey(TourismServiceCategory, on_delete=models.CASCADE)
     siGunGuCode = models.ForeignKey(SeoulAreaCode, on_delete=models.CASCADE)
     addr = models.CharField(max_length=255, null=False)
     title = models.CharField(max_length=255, null=False)
