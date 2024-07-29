@@ -37,12 +37,10 @@ jobs:
 
                 "git pull origin main", 
 
-                "# 2. Update dependencies on EC2", 
-                "sudo chown -R ubuntu:ubuntu /home/ubuntu/.cache/pip",
-                "sudo -H pip install -r requirements.txt",
+
 
                 "# 3. Update .env from S3 on EC2", 
-                "pip install awscli",
+                "sudo pip install awscli",
                 "aws s3 cp s3://hellokorea-test-zone/prod_web_env/.env.production /home/ubuntu/django/hellokorea/.env.production", 
 
                 "# 4. Recollect statics on EC2", 
