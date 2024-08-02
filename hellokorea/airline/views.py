@@ -94,7 +94,7 @@ async def search_flights(request):
     exchange_rate = None
     if page_obj:
         try:
-            exchange_rate = await sync_to_async(lambda: list(ExchangeRate.objects.get(currencyCode=page_obj[0].currencyCode)))()
+            exchange_rate = await sync_to_async(lambda: ExchangeRate.objects.get(currencyCode=page_obj[0].currencyCode))()
         except ExchangeRate.DoesNotExist:
             exchange_rate = None
 
