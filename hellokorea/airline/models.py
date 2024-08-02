@@ -11,8 +11,6 @@ class CheapestFlight(models.Model):
     arrTime = models.DateTimeField(null=True)
     price = models.FloatField(null=True)
     url = models.CharField(max_length=800, null=True)
-    createdAt = models.DateTimeField(auto_now_add=True, null=False)
-    updatedAt = models.DateTimeField(auto_now=True, null=False)
     
 class ExchangeRate(models.Model):
     currencyCode = models.CharField(max_length=10, unique=True, null=False)
