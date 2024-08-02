@@ -93,8 +93,10 @@ async def search_flights(request):
 
     exchange_rate = None
     if page_obj:
-        # airport_info = await sync_to_async(lambda: CheapestFlight.objects.filter(depAirportCode=dep_airport).first())()
-        exchange_rate = await sync_to_async(lambda: list(ExchangeRate.objects.get(currencyCode=page_obj[0].currencyCode)))()
+        try:
+            exchange_rate = await sync_to_async(lambda: list(ExchangeRate.objects.get(currencyCode=page_obj[0].currencyCode)))()
+        except ExchangeRate.DoesNotExist:
+            exchange_rate = None
 
     weather_data_date = arr_date if arr_date else dep_date
     weather_data = None
