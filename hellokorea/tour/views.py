@@ -146,11 +146,11 @@ def get_events(request, district_name):
         'poster', 'prfnm', 'genrenm', 'eventStart', 'eventEnd', 'seatPrice', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
     )
     if start_date and end_date:
-        events = events.filter(eventStart__lte=start_date, eventEnd__gte=end_date)
+        events = events.filter(eventStart__lte=end_date, eventEnd__gte=start_date)
     elif start_date:
-        events = events.filter(eventStart__lte=start_date)
+        events = events.filter(eventEnd__gte=start_date)
     elif end_date:
-        events = events.filter(eventEnd__gte=end_date)
+        events = events.filter(eventStart__lte=end_date)
     if genre:
         events = events.filter(genrenm=translate_dict[genre])
 
