@@ -56,13 +56,13 @@ async def index(request):
             return JsonResponse({
                 'error': 'Error rendering template'
             }, status=500)
-
+    
     return render(request, 'airline/index.html', context)
 
 async def search_flights(request):
     dep_airport = request.GET.get('depAirportCodes')
     dep_date = request.GET.get('depDate')
-    arr_date = request.GET.get('arrDate')
+    # arr_date = request.GET.get('arrDate')
 
     # Get all airports for the dropdown
     airports = await sync_to_async(lambda: list(CheapestFlight.objects.values('depAirportCode').distinct()))()
@@ -76,9 +76,9 @@ async def search_flights(request):
         dep_date_utc = get_tz_date(dep_date)
         q_objects &= Q(depTime__date=dep_date_utc.date())
 
-    if arr_date:
-        arr_date_utc = get_tz_date(arr_date, 'Asia/Seoul')
-        q_objects &= Q(arrTime__date=arr_date_utc.date())
+    # if arr_date:
+    #     arr_date_utc = get_tz_date(arr_date, 'Asia/Seoul')
+    #     q_objects &= Q(arrTime__date=arr_date_utc.date())
 
     flights = await sync_to_async(lambda: list(CheapestFlight.objects.filter(q_objects)))()
 
@@ -98,7 +98,8 @@ async def search_flights(request):
         except ExchangeRate.DoesNotExist:
             exchange_rate = None
 
-    weather_data_date = arr_date if arr_date else dep_date
+    # weather_data_date = arr_date if arr_date else dep_date
+    weather_data_date = dep_date
     weather_data = None
 
     if weather_data_date:

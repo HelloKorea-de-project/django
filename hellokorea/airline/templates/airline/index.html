@@ -18,10 +18,10 @@
         Departure Date</label>
       <input type="date" id="depDate" name="depDate"  value="{{ request.GET.depDate }}"/>
     </div>
-    <div style="display: flex; margin-top: 5px; flex-direction: column;">
+    <!-- <div style="display: flex; margin-top: 5px; flex-direction: column;">
       <label for="arrDate">Arrival Date</label>
       <input type="date" id="arrDate" name="arrDate"  value="{{ request.GET.arrDate }}"/>
-    </div>
+    </div> -->
       <button type="submit" style="margin-top: 10px;">Search</button>
       <button type="button" onclick="resetFilters()">Reset</button>
     </form>
@@ -51,6 +51,9 @@
     </div>
     {% endif %}
 
+    
+    <div style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+      <span style="font-weight: bold;">Korea weather last year at the same time</span>
     <div class="weather-list">
       {% for weather in weather_data %}
       <div class="weather-item">
@@ -73,6 +76,7 @@
       </div>
       {% endfor %}
     </div>
+  </div>
   </div>
 </div>
 
