@@ -209,21 +209,11 @@
     });
 
     // Fetch initial data for all sections
-    fetch(`/tour/district/${districtName}/tour-info/`)
+    fetch(`/tour/district/${districtName}/all/`)
       .then((response) => response.json())
       .then((data) => {
         updateAttractions(data.tour_infos);
-      });
-
-    fetch(`/tour/district/${districtName}/events/`)
-      .then((response) => response.json())
-      .then((data) => {
         updateEvents(data.events);
-      });
-
-    fetch(`/tour/district/${districtName}/lodgings/`)
-      .then((response) => response.json())
-      .then((data) => {
         updateLodgings(data.lodgings);
       });
 
