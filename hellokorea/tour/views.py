@@ -118,14 +118,10 @@ def get_district_detail(request, district_name):
         events = list(events)
         lodgings = list(lodgings)
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
+        translated_events = [translate_event_sync(event) for event in events]
 
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
-
+        translated_lodgings = [translate_lodging_sync(lodging) for lodging in lodgings]
+        
         return JsonResponse({
             'tour_infos': tour_infos,
             'events': translated_events,
@@ -183,6 +179,19 @@ async def translate_event(event):
             'mt10id__lo': event['mt10id__lo'],
         }
 
+def translate_event_sync(event):
+        return {
+            'poster': event['poster'],
+            'prfnm': translate_text_sync(event['prfnm']),
+            'genrenm': translate_text_sync(event['genrenm'], field_name='genrenm'),
+            'eventStart': event['eventStart'],
+            'eventEnd': event['eventEnd'],
+            'seatPrice': translate_text_sync(event['seatPrice']),
+            'mt10id__adres': translate_text_sync(event['mt10id__adres']),
+            'mt10id__la': event['mt10id__la'],
+            'mt10id__lo': event['mt10id__lo'],
+        }
+
 def get_lodgings(request, district_name):
     uptaenm = request.GET.get('uptaenms')
 
@@ -213,51 +222,24 @@ async def translate_lodging(lodging):
             'la': lodging['la'],
         }
 
+def translate_lodging_sync(lodging):
+        return {
+            'mgtno': lodging['mgtno'],
+            'rdnwhladdr': translate_text_sync(lodging['rdnwhladdr']),
+            'bplcnm': translate_text_sync(lodging['bplcnm']),
+            'uptaenm': translate_text_sync(lodging['uptaenm'], field_name='uptaenm'),
+            'lo': lodging['lo'],
+            'la': lodging['la'],
+        }
+
 async def translate_text(text, target_language='EN-US', field_name=None):
     result = translator.translate_text(text, target_lang=target_language)
     if field_name == 'uptaenm' or field_name == 'genrenm':
         translate_dict[result.text] = text
     return result.text
 
-# def filter_data(request, district_name):
-#     if request.method == "GET":
-#         category = request.GET.get('category')
-#         start_date = request.GET.get('start_date')
-#         end_date = request.GET.get('end_date')
-#         genre = request.GET.get('genre')
-#         uptaenms = request.GET.get('uptaenms')
-
-#         # Fetch the SeoulAreaCode based on the district_name
-#         area_code = SeoulAreaCode.objects.get(name=district_name).code
-
-#         # Fetch and filter data based on user inputs
-#         tour_infos = SeoulTourInfo.objects.filter(siGunGuCode__name=district_name).select_related('cat3').values(
-#             'firstImage', 'title', 'cat3__subCategory1', 'cat3__subCategory2', 'addr', 'la', 'lo'
-#         )
-#         if category:
-#             tour_infos = tour_infos.filter(cat3__mainCategory=category)
-        
-#         events = events.objects.filter(mt10id__gugunnm=district_name).values(
-#             'poster', 'prfnm', 'genrenm', 'eventStart', 'eventEnd', 'seatPrice', 'mt10id__adres', 'mt10id__la', 'mt10id__lo'
-#         )
-#         if start_date and end_date:
-#             events = events.filter(eventStart__gte=start_date, eventEnd__lte=end_date)
-#         if genre:
-#             events = events.filter(genrenm=genre)
-
-#         lodgings = Lodging.objects.filter(addCode=area_code).values(
-#             'mgtno', 'rdnwhladdr', 'bplcnm', 'uptaenm', 'lo', 'la'
-#         )
-#         if uptaenms:
-#             lodgings = lodgings.filter(uptaenm=uptaenms)
-
-#         # Convert querysets to list of dictionaries
-#         tour_infos = list(tour_infos)
-#         events = list(events)
-#         lodgings = list(lodgings)
-
-#         return JsonResponse({
-#             'tour_infos': tour_infos,
-#             'events': events,
-#             'lodgings': lodgings
-#         })
+def translate_text_sync(text, target_language='EN-US', field_name=None):
+    result = translator.translate_text(text, target_lang=target_language)
+    if field_name == 'uptaenm' or field_name == 'genrenm':
+        translate_dict[result.text] = text
+    return result.text
