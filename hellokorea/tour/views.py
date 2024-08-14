@@ -118,10 +118,14 @@ def get_district_detail(request, district_name):
         events = list(events)
         lodgings = list(lodgings)
 
-        translated_events = [translate_event_sync(event) for event in events]
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
 
-        translated_lodgings = [translate_lodging_sync(lodging) for lodging in lodgings]
-        
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
+
         return JsonResponse({
             'tour_infos': tour_infos,
             'events': translated_events,
