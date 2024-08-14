@@ -118,10 +118,18 @@ def get_district_detail(request, district_name):
         events = list(events)
         lodgings = list(lodgings)
 
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
+
         return JsonResponse({
             'tour_infos': tour_infos,
-            'events': events,
-            'lodgings': lodgings
+            'events': translated_events,
+            'lodgings': translated_lodgings
         })
     
 def get_tour_info(request, district_name):
@@ -156,7 +164,13 @@ def get_events(request, district_name):
 
     events = list(events)
 
-    async def translate_event(event):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
+
+    return JsonResponse({'events': translated_events})
+
+async def translate_event(event):
         return {
             'poster': event['poster'],
             'prfnm': await translate_text(event['prfnm']),
@@ -168,12 +182,6 @@ def get_events(request, district_name):
             'mt10id__la': event['mt10id__la'],
             'mt10id__lo': event['mt10id__lo'],
         }
-
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    translated_events = loop.run_until_complete(asyncio.gather(*[translate_event(event) for event in events]))
-
-    return JsonResponse({'events': translated_events})
 
 def get_lodgings(request, district_name):
     uptaenm = request.GET.get('uptaenms')
@@ -188,8 +196,14 @@ def get_lodgings(request, district_name):
         lodgings = lodgings.filter(uptaenm=translate_dict[uptaenm])
 
     lodgings = list(lodgings)
+    
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
 
-    async def translate_lodging(lodging):
+    return JsonResponse({'lodgings': translated_lodgings})
+
+async def translate_lodging(lodging):
         return {
             'mgtno': lodging['mgtno'],
             'rdnwhladdr': await translate_text(lodging['rdnwhladdr']),
@@ -198,12 +212,6 @@ def get_lodgings(request, district_name):
             'lo': lodging['lo'],
             'la': lodging['la'],
         }
-    
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    translated_lodgings = loop.run_until_complete(asyncio.gather(*[translate_lodging(lodging) for lodging in lodgings]))
-
-    return JsonResponse({'lodgings': translated_lodgings})
 
 async def translate_text(text, target_language='EN-US', field_name=None):
     result = translator.translate_text(text, target_lang=target_language)
